@@ -1,4 +1,8 @@
 package is.hi.hbv601g.verzlunapp.Services;
 
-public class UserService {
+import is.hi.hbv601g.verzlunapp.Persistence.User;
+
+public interface UserService {
+    boolean registerUser(User user);
+    User getCurrentUser();
 }

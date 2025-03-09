@@ -1,20 +1,23 @@
-package com.example.verzlunapp;
+package is.hi.hbv601g.verzlunapp;
 
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+
+import is.hi.hbv601g.verzlunapp.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.View;
+
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.databinding.ActivityMainBinding;
+
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
