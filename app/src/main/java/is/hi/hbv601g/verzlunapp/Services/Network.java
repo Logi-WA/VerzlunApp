@@ -26,35 +26,12 @@ public class Network {
     private String PASSWORD = "pf4580202c8a6cca374c37e81a99b531788b15e937d204401cff7c626626ab8c5";
     private String DRIVER_CLASS_NAME = "org.postgresql.Driver";
 
-
-
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-
-
     private final OkHttpClient mClient = new OkHttpClient();
 
     //public JSONObject getRequest(String api) {
 
     //}
-
-    /*public JSONObject logIn(String email, String password) throws IOException {
-        Request request = new Request.Builder().url(BASE_URL + "/api").build();
-
-        JSONObject user;
-        Call call = mClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                //return user;
-            }
-        });
-        return user;
-    }*/
 
     public void registerUser(String username, String email, String password) throws IOException {
         RequestBody formBody = new FormBody.Builder()
