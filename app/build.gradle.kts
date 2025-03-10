@@ -1,5 +1,5 @@
-plugins {
-    id("com.android.application")
+plugins { 
+    id("com.android.application") 
     id("org.jetbrains.kotlin.android") // Ensure Kotlin plugin is applied
 }
 
@@ -28,12 +28,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11" // Ensure Kotlin is using the correct JVM target
+        jvmTarget = "17" // Ensure Kotlin is using the correct JVM target
     }
 
     // ✅ Enable ViewBinding & DataBinding

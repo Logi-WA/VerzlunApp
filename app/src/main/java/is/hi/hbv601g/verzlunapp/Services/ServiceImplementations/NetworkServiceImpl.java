@@ -1,4 +1,4 @@
-package is.hi.hbv601g.verzlunapp.ServiceImplementations;
+package is.hi.hbv601g.verzlunapp.Services.ServiceImplementations;
 
 import is.hi.hbv601g.verzlunapp.Services.NetworkService;
 
