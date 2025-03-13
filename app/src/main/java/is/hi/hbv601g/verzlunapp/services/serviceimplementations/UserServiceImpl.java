@@ -1,7 +1,7 @@
-package is.hi.hbv601g.verzlunapp.Services.ServiceImplementations;
+package is.hi.hbv601g.verzlunapp.services.serviceimplementations;
 
-import is.hi.hbv601g.verzlunapp.Persistence.User;
-import is.hi.hbv601g.verzlunapp.Services.UserService;
+import is.hi.hbv601g.verzlunapp.persistence.User;
+import is.hi.hbv601g.verzlunapp.services.UserService;
 
 public class UserServiceImpl implements UserService {
     private static User currentUser;

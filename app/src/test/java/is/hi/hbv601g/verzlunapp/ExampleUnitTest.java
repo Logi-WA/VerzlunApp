@@ -1,4 +1,4 @@
-package com.example.verzlunapp;
+package is.hi.hbv601g.verzlunapp;
 
 import org.junit.Test;
 

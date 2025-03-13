@@ -23,11 +23,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Keep MainActivity but remove the launcher intent-filter -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false">
-        </activity>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package is.hi.hbv601g.verzlunapp.Persistence;
+package is.hi.hbv601g.verzlunapp.persistence;
 
 import org.json.JSONException;
 import org.json.JSONObject;

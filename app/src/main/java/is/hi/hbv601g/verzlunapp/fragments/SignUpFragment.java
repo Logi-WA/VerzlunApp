@@ -1,4 +1,4 @@
-package is.hi.hbv601g.verzlunapp.Fragments;
+package is.hi.hbv601g.verzlunapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

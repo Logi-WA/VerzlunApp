@@ -8,7 +8,7 @@
     <!-- SignUpFragment -->
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="is.hi.hbv601g.verzlunapp.Fragments.SignUpFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.SignUpFragment"
         android:label="Sign Up"
         tools:layout="@layout/fragment_signup" />
 </navigation>

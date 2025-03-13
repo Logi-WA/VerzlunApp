@@ -1,4 +1,4 @@
-package is.hi.hbv601g.verzlunapp.Persistence;
+package is.hi.hbv601g.verzlunapp;
 
 import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
@@ -8,6 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import java.util.List;
 import static org.junit.Assert.*;
+
+import is.hi.hbv601g.verzlunapp.persistence.User;
+import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
 
 public class UserStorageTest {
     private UserStorage userStorage;

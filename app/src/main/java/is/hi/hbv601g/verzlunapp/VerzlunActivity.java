@@ -1,18 +1,22 @@
 package is.hi.hbv601g.verzlunapp;
 
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import is.hi.hbv601g.verzlunapp.Fragments.SignInFragment;
-import is.hi.hbv601g.verzlunapp.Persistence.User;
-import is.hi.hbv601g.verzlunapp.Persistence.UserStorage;
+import is.hi.hbv601g.verzlunapp.fragments.SignInFragment;
+import is.hi.hbv601g.verzlunapp.persistence.User;
+import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -34,15 +38,17 @@ public class VerzlunActivity extends AppCompatActivity {
     }
 
     private void initializeSampleUsers() {
-        try {
-            InputStream is = getResources().openRawResource(R.raw.sample_users);
+        UserStorage storage = new UserStorage(this);
+        if (!storage.getUsers().isEmpty()) {
+            return;
+        }
+
+        try (InputStream is = getResources().openRawResource(R.raw.sample_users)) {
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
-            is.close();
             String json = new String(buffer, "UTF-8");
 
             JSONArray jsonArray = new JSONArray(json);
-            UserStorage storage = new UserStorage(this);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject userJson = jsonArray.getJSONObject(i);
@@ -51,8 +57,12 @@ public class VerzlunActivity extends AppCompatActivity {
                     storage.saveUser(user);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Resources.NotFoundException e) {
+            Log.e("VerzlunActivity", "Sample users resource not found", e);
+        } catch (IOException e) {
+            Log.e("VerzlunActivity", "Error reading sample users file", e);
+        } catch (JSONException e) {
+            Log.e("VerzlunActivity", "Error parsing sample users JSON", e);
         }
     }
 }

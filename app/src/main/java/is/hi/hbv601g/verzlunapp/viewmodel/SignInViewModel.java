@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import is.hi.hbv601g.verzlunapp.Persistence.User;
-import is.hi.hbv601g.verzlunapp.Persistence.UserStorage;
+import is.hi.hbv601g.verzlunapp.persistence.User;
+import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package is.hi.hbv601g.verzlunapp.Persistence;
+package is.hi.hbv601g.verzlunapp.persistence;
 
 import android.content.Context;
 import android.content.SharedPreferences;

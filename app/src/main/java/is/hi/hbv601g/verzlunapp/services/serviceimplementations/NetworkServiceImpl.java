@@ -1,6 +1,6 @@
-package is.hi.hbv601g.verzlunapp.Services.ServiceImplementations;
+package is.hi.hbv601g.verzlunapp.services.serviceimplementations;
 
-import is.hi.hbv601g.verzlunapp.Services.NetworkService;
+import is.hi.hbv601g.verzlunapp.services.NetworkService;
 
 public class NetworkServiceImpl implements NetworkService {
     @Override

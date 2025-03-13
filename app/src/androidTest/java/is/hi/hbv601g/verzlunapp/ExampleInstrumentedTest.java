@@ -1,4 +1,4 @@
-package com.example.verzlunapp;
+package is.hi.hbv601g.verzlunapp;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.verzlunapp", appContext.getPackageName());
+        assertEquals("is.hi.hbv601g.verzlunapp", appContext.getPackageName());
     }
 }

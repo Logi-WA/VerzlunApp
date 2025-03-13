@@ -1,6 +1,6 @@
-package is.hi.hbv601g.verzlunapp.Services;
+package is.hi.hbv601g.verzlunapp.services;
 
-import is.hi.hbv601g.verzlunapp.Persistence.User;
+import is.hi.hbv601g.verzlunapp.persistence.User;
 
 public interface UserService {
     boolean registerUser(User user);
