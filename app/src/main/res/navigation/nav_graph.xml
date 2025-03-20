@@ -1,14 +1,66 @@
-<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/signUpFragment">
+    app:startDestination="@id/signInFragment">
 
-    <!-- SignUpFragment -->
+    <!-- Sign In -->
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.SignInFragment"
+        android:label="Sign In"
+        tools:layout="@layout/fragment_signin">
+
+        <action
+            android:id="@+id/action_signInFragment_to_homeFragment"
+            app:destination="@id/homeFragment"/>
+    </fragment>
+
+    <!-- Sign Up -->
     <fragment
         android:id="@+id/signUpFragment"
         android:name="is.hi.hbv601g.verzlunapp.fragments.SignUpFragment"
         android:label="Sign Up"
-        tools:layout="@layout/fragment_signup" />
+        tools:layout="@layout/fragment_signup"/>
+
+    <!-- Home -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_home_to_cart"
+            app:destination="@id/cartFragment"/>
+
+        <action
+            android:id="@+id/action_home_to_wishlist"
+            app:destination="@id/wishlistFragment"/>
+
+        <action
+            android:id="@+id/action_home_to_categories"
+            app:destination="@id/categoriesFragment"/>
+    </fragment>
+
+    <!-- Cart -->
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.CartFragment"
+        android:label="Cart"
+        tools:layout="@layout/fragment_cart"/>
+
+    <!-- Wishlist -->
+    <fragment
+        android:id="@+id/wishlistFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.WishlistFragment"
+        android:label="Wishlist"
+        tools:layout="@layout/fragment_wishlist"/>
+
+    <!-- Categories -->
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.CategoriesFragment"
+        android:label="Categories"
+        tools:layout="@layout/fragment_categories"/>
 </navigation>
