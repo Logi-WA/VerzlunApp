@@ -28,12 +28,6 @@
             android:layout_height="wrap_content"
             android:text="TextView" />
 
-        <TextView
-            android:id="@+id/ProductDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,7 +46,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/ProductDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,14 +67,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Add to Cart" />
+                android:text="@string/add_to_cart" />
 
             <Button
                 android:id="@+id/AddToWishlist"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Add to wishlist" />
+                android:text="@string/add_to_wishlist" />
+
         </LinearLayout>
-</LinearLayout>
+    </LinearLayout>
 </layout>
