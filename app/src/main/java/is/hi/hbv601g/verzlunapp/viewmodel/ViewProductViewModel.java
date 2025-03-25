@@ -9,24 +9,17 @@ import androidx.lifecycle.MutableLiveData;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
 
 public class ViewProductViewModel extends AndroidViewModel {
-    private Product mProduct;
-    public MutableLiveData<Double> rating = new MutableLiveData<>();
-
+    private Product product;
     public ViewProductViewModel(@NonNull Application application) {
         super(application);
-        //mProduct = product;
     }
 
-    public ViewProductViewModel(@NonNull Application application, Product product) {
-        super(application);
-        mProduct = product;
-    }
-    public void addToCart() {
-        System.out.println("Add "+ mProduct.getName() + " to cart.");
+    public Product getProduct() {
+        return product;
     }
 
-    public void addToWishlist() {
-        System.out.println(("Add " + mProduct.getName() + " to wishlist."));
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
 }

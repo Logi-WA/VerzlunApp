@@ -11,9 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
-import is.hi.hbv601g.verzlunapp.R;
+import org.json.JSONObject;
+
 import is.hi.hbv601g.verzlunapp.databinding.FragmentViewProductBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
 import is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel;
@@ -23,9 +23,7 @@ public class ViewProductFragment extends Fragment {
     private FragmentViewProductBinding binding;
     private ViewProductViewModel viewModel;
 
-    private Button mAddToCart, mAddToWishlist;
-    private long lid = 1;
-    private Product mProduct = new Product(lid, "Waffle Iron", "Makes excellent waffles", 99.95);
+    private Product mProduct;
 
     public static ViewProductFragment newInstance(Product product) {
         ViewProductFragment fragment = new ViewProductFragment();
@@ -44,31 +42,30 @@ public class ViewProductFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(ViewProductViewModel.class);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
-        /*
-        View v = new View(getContext());
-        mAddToCart = (Button) v.findViewById(R.id.AddToCart);
-        mAddToCart.setOnClickListener(new View.OnClickListener() {
+
+        //Temporary placeholder for retrieving products
+        mProduct = new Product("Test", "example", 99.99);
+
+        //binding.ProductPicture.setImageResource();
+        binding.ProductName.setText(mProduct.getName());
+        binding.ProductPrice.setText("" + mProduct.getPrice());
+
+        binding.ProductDescription.setText(mProduct.getDescription());
+
+        binding.AddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(requireContext(), "Add " + mProduct.getName() + " to Cart", Toast.LENGTH_SHORT).show();
+                System.out.println("Add product to cart.");
+            }
+        });
+        binding.AddToWishlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("Add product to wishlist.");
             }
         });
 
-        mAddToWishlist = (Button) v.findViewById(R.id.addToWishlist);
-        mAddToWishlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(requireContext(), "Add " + mProduct.getName() + " to wishlist", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        setupObservers();
-        */
         return binding.getRoot();
-    }
-
-    private void setupObservers() {
-
     }
 
     @Override
