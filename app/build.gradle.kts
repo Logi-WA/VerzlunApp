@@ -52,14 +52,4 @@ dependencies {
     // Fix Kotlin duplicate class issue: Use only kotlin-stdlib
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.10")
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-}
 
-// Force Kotlin 1.8.22 to prevent duplicate class conflicts
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlin:kotlin-stdlib:2.1.10")
-    }
-}
