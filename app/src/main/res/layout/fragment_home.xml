@@ -59,6 +59,15 @@
                 android:src="@drawable/ic_heart"
                 android:contentDescription="Wishlist"
                 android:padding="5dp"/>
+            <!-- Account Button -->
+            <ImageView
+                android:id="@+id/navAccountButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_account"
+                android:contentDescription="Account"
+                android:padding="5dp"/>
+
         </LinearLayout>
 
         <!-- Dropdown Menu -->
@@ -77,11 +86,6 @@
                 android:layout_height="wrap_content"
                 android:text="Categories"/>
 
-            <Button
-                android:id="@+id/navAccountButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Account"/>
         </LinearLayout>
 
         <!-- Main Content -->

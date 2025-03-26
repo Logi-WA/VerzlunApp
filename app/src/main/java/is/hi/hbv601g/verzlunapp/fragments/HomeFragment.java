@@ -46,6 +46,12 @@ public class HomeFragment extends Fragment {
             Navigation.findNavController(v).navigate(R.id.wishlistFragment);
         });
 
+        // Account button navigation
+        binding.navAccountButton.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "Navigating to Account", Toast.LENGTH_SHORT).show();
+            Navigation.findNavController(v).navigate(R.id.accountFragment);
+        });
+
         // Categories navigation
         binding.navCategoriesButton.setOnClickListener(v -> {
             Navigation.findNavController(v).navigate(R.id.categoriesFragment);
