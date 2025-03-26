@@ -1,6 +1,8 @@
 package is.hi.hbv601g.verzlunapp.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.viewmodel.SignInViewModel;
@@ -35,21 +39,21 @@ public class SignInFragment extends Fragment {
 
     private void setupObservers() {
         viewModel.isAuthenticated.observe(getViewLifecycleOwner(), isAuthenticated -> {
-            if (isAuthenticated) {
+            if (isAuthenticated != null && isAuthenticated) {
                 Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                // Navigate to the main content
-                // Could use Navigation component or FragmentTransaction
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (getView() != null) { // Prevents crash if fragment is detached
+                        Navigation.findNavController(getView()).navigate(R.id.action_signInFragment_to_homeFragment);
+                    }
+                }, 500);
             }
         });
     }
 
+
     private void setupClickListeners() {
         binding.signinToSignupLink.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, new SignUpFragment())
-                    .addToBackStack(null)
-                    .commit();
+            Navigation.findNavController(v).navigate(R.id.signUpFragment);
         });
     }
 
