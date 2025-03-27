@@ -41,6 +41,9 @@
         <action
             android:id="@+id/action_home_to_categories"
             app:destination="@id/categoriesFragment"/>
+        <action
+            android:id="@+id/action_home_to_account"
+            app:destination="@id/accountFragment" />
     </fragment>
 
     <!-- Cart -->
@@ -56,6 +59,27 @@
         android:name="is.hi.hbv601g.verzlunapp.fragments.WishlistFragment"
         android:label="Wishlist"
         tools:layout="@layout/fragment_wishlist"/>
+
+    <!-- Account -->
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.AccountFragment"
+        android:label="Account"
+        tools:layout="@layout/fragment_account"/>
+
+    <!-- Edit Profile -->
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.EditProfileFragment"
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile"/>
+
+    <!-- Change Password -->
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.ChangePasswordFragment"
+        android:label="Change Password"
+        tools:layout="@layout/fragment_change_password"/>
 
     <!-- Categories -->
     <fragment
