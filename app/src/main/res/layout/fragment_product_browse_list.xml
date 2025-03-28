@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+<!--    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel" />
+    </data>-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".VerzlunActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/productRecycler"
+            tools:listitem="@layout/fragment_product_list_item" />
+
+    </LinearLayout>
+
+</LinearLayout>
+</layout>
