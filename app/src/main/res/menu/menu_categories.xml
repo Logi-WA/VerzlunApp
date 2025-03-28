@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/category_electronics" android:title="Electronics"/>
+    <item android:id="@+id/category_furniture" android:title="Furniture"/>
+    <item android:id="@+id/category_books" android:title="Books"/>
+</menu>

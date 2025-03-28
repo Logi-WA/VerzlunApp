@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,8 +31,15 @@ public class HomeFragment extends Fragment {
     private void setupClickListeners() {
         // Menu button opens a dropdown
         binding.navMenuButton.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Menu clicked", Toast.LENGTH_SHORT).show();
-            // TODO: Implement actual menu dropdown
+            PopupMenu popupMenu = new PopupMenu(requireContext(), v);
+            popupMenu.getMenuInflater().inflate(R.menu.menu_categories, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("categoryName", item.getTitle().toString());
+                Navigation.findNavController(v).navigate(R.id.categoriesFragment, bundle);
+                return true;
+            });
+            popupMenu.show();
         });
 
         // Cart button navigation
