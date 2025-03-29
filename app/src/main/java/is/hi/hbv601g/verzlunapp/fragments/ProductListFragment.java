@@ -4,12 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,11 +18,10 @@ import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.adapters.BrowseAdapter;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentProductBrowseListBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
-//import is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel;
+
 
 public class ProductListFragment extends Fragment {
     private FragmentProductBrowseListBinding binding;
-    //private ViewProductViewModel viewModel;
 
     @Override
     public void onCreate(Bundle savedIsntanceState) {
@@ -56,8 +53,10 @@ public class ProductListFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ProdList pl = new ProdList();
-        ArrayList<Product> products = pl.products;
+        // Placeholder data
+        //ProdList pl = new ProdList();
+        //ArrayList<Product> products = pl.products;
+        ArrayList<Product> products = new ArrayList<>();
 
         BrowseAdapter itemAdapter = new BrowseAdapter(products);
 

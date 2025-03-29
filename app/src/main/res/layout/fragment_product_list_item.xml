@@ -79,14 +79,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:text="add_to_cart"/>
+                    android:text="@string/add_to_cart"/>
 
                 <Button
                     android:id="@+id/addToWishlist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:text="add_to_wishlist"/>
+                    android:text="@string/add_to_wishlist"/>
 
             </LinearLayout>
         </LinearLayout>

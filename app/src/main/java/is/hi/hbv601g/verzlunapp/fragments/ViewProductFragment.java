@@ -18,7 +18,11 @@ import is.hi.hbv601g.verzlunapp.databinding.FragmentViewProductBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
 import is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel;
 
-
+/**
+ * This fragment displays information for a given product. It contains
+ * an ImageView, a  series of TextViews and two buttons to add the product
+ * to the user's cart and wishlist respectively.
+ */
 public class ViewProductFragment extends Fragment {
     private FragmentViewProductBinding binding;
     private ViewProductViewModel viewModel;
@@ -32,6 +36,18 @@ public class ViewProductFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return a view object where everything has been set
+     */
     @Nullable
     @Override
     public View onCreateView(
@@ -43,15 +59,18 @@ public class ViewProductFragment extends Fragment {
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
 
-        //Temporary placeholder for retrieving products
+        //Temporary placeholder for retrieving products, replace with a proper product retrieval later
         mProduct = new Product("Test", "example", 99.99);
 
+        // Set the data that will be displayed in the various views in the fragment
         //binding.ProductPicture.setImageResource();
         binding.ProductName.setText(mProduct.getName());
         binding.ProductPrice.setText("" + mProduct.getPrice());
-
         binding.ProductDescription.setText(mProduct.getDescription());
 
+        // Add recyclerview for showing reviews later
+
+        // Set onclicklisteners for the buttons to add product to cart or wishlist respectively
         binding.AddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
