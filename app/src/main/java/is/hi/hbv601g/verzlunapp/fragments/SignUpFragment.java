@@ -13,8 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import is.hi.hbv601g.verzlunapp.R;
-import is.hi.hbv601g.verzlunapp.viewmodel.SignUpViewModel;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentSignupBinding;
+import is.hi.hbv601g.verzlunapp.viewmodel.SignUpViewModel;
 
 public class SignUpFragment extends Fragment {
     private FragmentSignupBinding binding;

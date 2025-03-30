@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <import type="android.view.View" />
 
         <variable
@@ -49,15 +50,24 @@
             android:textColor="@android:color/holo_red_dark"
             android:visibility="@{viewModel.errorMessage != null ? View.VISIBLE : View.GONE}" />
 
+        <ProgressBar
+            android:id="@+id/loadingIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}" />
+
         <Button
             android:id="@+id/signinButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:backgroundTint="@color/purple_500"
+            android:enabled="@{!viewModel.isLoading}"
             android:onClick="@{() -> viewModel.loginUser()}"
             android:padding="10dp"
-            android:text="Sign In"
+            android:text='@{viewModel.isLoading ? "Signing In..." : "Sign In"}'
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 

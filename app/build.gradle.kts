@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.kapt")
-    id("com.github.ben-manes.versions") version "0.47.0"
+//    id("org.jetbrains.kotlin.kapt")
+    id("com.github.ben-manes.versions") version "0.52.0"
 }
 
 android {
@@ -43,6 +43,15 @@ android {
         dataBinding = true
     }
 }
+
+/*kapt {
+    javacOptions {
+        option("--add-opens", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED")
+        option("--add-opens", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
+        option("--add-opens", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED")
+        option("--add-opens", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED")
+    }
+}*/
 
 dependencies {
     implementation(libs.appcompat)

@@ -8,6 +8,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean registerUser(User user) {
+        // This method will now be handled by the SignUpService
         if (user.getEmail().contains("@") && user.getPassword().length() >= 6) {
             currentUser = user;
             return true;
@@ -18,5 +19,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    @Override
+    public void setCurrentUser(User user) {
+        currentUser = user;
     }
 }

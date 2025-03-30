@@ -6,22 +6,29 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import is.hi.hbv601g.verzlunapp.persistence.User;
-import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-import java.util.List;
+import is.hi.hbv601g.verzlunapp.services.NetworkService;
+import is.hi.hbv601g.verzlunapp.services.SignInService;
+import is.hi.hbv601g.verzlunapp.services.UserService;
+import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
+import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 
 public class SignInViewModel extends AndroidViewModel {
     public MutableLiveData<String> email = new MutableLiveData<>();
     public MutableLiveData<String> password = new MutableLiveData<>();
     public MutableLiveData<String> errorMessage = new MutableLiveData<>();
     public MutableLiveData<Boolean> isAuthenticated = new MutableLiveData<>(false);
-
-    private UserStorage userStorage;
+    private final SignInService signInService;
+    private final Executor executor = Executors.newSingleThreadExecutor();
+    public MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
     public SignInViewModel(@NonNull Application application) {
         super(application);
-        userStorage = new UserStorage(application);
+        NetworkService networkService = NetworkServiceImpl.getInstance();
+        UserService userService = new UserServiceImpl();
+        signInService = new SignInService(networkService, userService);
     }
 
     public void loginUser() {
@@ -38,16 +45,23 @@ public class SignInViewModel extends AndroidViewModel {
             return;
         }
 
-        // Authenticate against stored users
-        List<User> users = userStorage.getUsers();
-        for (User user : users) {
-            if (user.getEmail().equals(userEmail) && user.getPassword().equals(userPassword)) {
-                isAuthenticated.setValue(true);
-                errorMessage.setValue(null);
-                return;
-            }
-        }
+        // Show loading state
+        isLoading.setValue(true);
 
-        errorMessage.setValue("Invalid email or password");
+        // Authenticate via API on background thread
+        executor.execute(() -> {
+            boolean success = signInService.loginUser(userEmail, userPassword);
+
+            // Update UI on main thread
+            isLoading.postValue(false);
+
+            if (success) {
+                isAuthenticated.postValue(true);
+                errorMessage.postValue(null);
+            } else {
+                isAuthenticated.postValue(false);
+                errorMessage.postValue("Invalid email or password");
+            }
+        });
     }
 }
