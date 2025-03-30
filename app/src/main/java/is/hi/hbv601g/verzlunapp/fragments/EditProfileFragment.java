@@ -105,9 +105,9 @@ public class EditProfileFragment extends Fragment {
 
         // Execute API call with Retrofit
         Call<Object> call = RetrofitClient.INSTANCE.getApiService().updateProfile(userDetails);
-        call.enqueue(new Callback<Object>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(@NonNull Call<Object> call, @NonNull Response<Object> response) {
                 if (getActivity() == null) return;
 
                 getActivity().runOnUiThread(() -> {
@@ -132,7 +132,7 @@ public class EditProfileFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(@NonNull Call<Object> call, @NonNull Throwable t) {
                 if (getActivity() == null) return;
 
                 getActivity().runOnUiThread(() -> {

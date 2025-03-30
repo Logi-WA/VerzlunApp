@@ -6,12 +6,15 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import is.hi.hbv601g.verzlunapp.model.SignupRequest;
+import is.hi.hbv601g.verzlunapp.model.SignupResponse;
+import is.hi.hbv601g.verzlunapp.network.RetrofitClient;
 import is.hi.hbv601g.verzlunapp.persistence.User;
-import is.hi.hbv601g.verzlunapp.services.NetworkService;
-import is.hi.hbv601g.verzlunapp.services.SignUpService;
 import is.hi.hbv601g.verzlunapp.services.UserService;
-import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
 import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignUpViewModel extends AndroidViewModel {
     public MutableLiveData<String> name = new MutableLiveData<>();
@@ -20,13 +23,11 @@ public class SignUpViewModel extends AndroidViewModel {
     public MutableLiveData<String> errorMessage = new MutableLiveData<>();
     public MutableLiveData<Boolean> signupSuccess = new MutableLiveData<>(false);
 
-    private final SignUpService signUpService;
+    private final UserService userService;
 
     public SignUpViewModel(@NonNull Application application) {
         super(application);
-        NetworkService networkService = NetworkServiceImpl.getInstance();
-        UserService userService = new UserServiceImpl();
-        signUpService = new SignUpService(networkService, userService);
+        userService = new UserServiceImpl();
     }
 
     public void registerUser() {
@@ -49,15 +50,34 @@ public class SignUpViewModel extends AndroidViewModel {
             return;
         }
 
-        // Create and register user through the API
-        User newUser = new User(userName, userEmail, userPassword);
-        boolean success = signUpService.registerUser(newUser);
+        // Create a SignupRequest object
+        SignupRequest signupRequest = new SignupRequest(userName, userEmail, userPassword);
 
-        if (success) {
-            errorMessage.setValue(null);
-            signupSuccess.setValue(true);
-        } else {
-            errorMessage.setValue("Registration failed. Please try again.");
-        }
+        // Use Retrofit to register the user
+        Call<SignupResponse> call = RetrofitClient.INSTANCE.getApiService().signup(signupRequest);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<SignupResponse> call, @NonNull Response<SignupResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User newUser = new User(userName, userEmail, userPassword);
+                    userService.setCurrentUser(newUser);
+                    errorMessage.setValue(null);
+                    signupSuccess.setValue(true);
+                } else {
+                    String error = "Registration failed. ";
+                    if (response.code() == 409) {
+                        error += "Email already in use.";
+                    } else {
+                        error += "Please try again.";
+                    }
+                    errorMessage.setValue(error);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<SignupResponse> call, @NonNull Throwable t) {
+                errorMessage.setValue("Network error: " + t.getMessage());
+            }
+        });
     }
 }

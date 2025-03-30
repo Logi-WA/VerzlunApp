@@ -62,9 +62,9 @@ public class ChangePasswordFragment extends Fragment {
 
         // Execute the API call with Retrofit
         Call<ResponseBody> call = RetrofitClient.INSTANCE.getApiService().changePassword(passwordDetails);
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (getActivity() == null) return;
 
                 binding.changePasswordButton.setEnabled(true);
@@ -83,7 +83,7 @@ public class ChangePasswordFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 if (getActivity() == null) return;
 
                 binding.changePasswordButton.setEnabled(true);

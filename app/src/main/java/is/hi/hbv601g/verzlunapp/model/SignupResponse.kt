@@ -4,5 +4,5 @@ data class SignupResponse(
     val success: Boolean,
     val message: String?,
     val userId: Long?,
-    val username: String?
+    val name: String?
 )

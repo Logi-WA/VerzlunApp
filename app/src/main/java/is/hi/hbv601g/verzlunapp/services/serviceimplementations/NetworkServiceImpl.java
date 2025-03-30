@@ -96,9 +96,9 @@ public class NetworkServiceImpl implements NetworkService {
     @Override
     public String post(String endpoint, String jsonPayload) {
         try {
-            Future<String> future = executor.submit(new Callable<String>() {
+            Future<String> future = executor.submit(new Callable<>() {
                 @Override
-                public String call() throws Exception {
+                public String call() {
                     try {
                         String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
                         URL url = new URL(BASE_URL + path);

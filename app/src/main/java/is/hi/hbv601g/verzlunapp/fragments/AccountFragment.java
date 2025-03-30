@@ -17,8 +17,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -29,7 +27,6 @@ import androidx.navigation.Navigation;
 import java.io.IOException;
 
 import is.hi.hbv601g.verzlunapp.R;
-
 import is.hi.hbv601g.verzlunapp.databinding.FragmentAccountBinding;
 import is.hi.hbv601g.verzlunapp.services.LogoutService;
 import is.hi.hbv601g.verzlunapp.services.NetworkService;
