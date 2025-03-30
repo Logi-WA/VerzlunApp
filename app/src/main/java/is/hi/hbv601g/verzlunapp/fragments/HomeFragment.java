@@ -8,9 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
-import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
@@ -21,33 +19,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
-    }
-
-    private void setupClickListeners() {
-        // Menu button opens a dropdown
-        binding.navMenuButton.setOnClickListener(v -> {
-            // TODO: Implement actual menu dropdown
-        });
-
-        // Cart button navigation
-        binding.navCartButton.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.cartFragment);
-        });
-
-        // Wishlist button navigation
-        binding.navWishlistButton.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.wishlistFragment);
-        });
-
-        // Account button navigation
-        binding.navAccountButton.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.accountFragment);
-        });
-
-        // Categories navigation
-        binding.navCategoriesButton.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.categoriesFragment);
-        });
     }
 
     @Override
