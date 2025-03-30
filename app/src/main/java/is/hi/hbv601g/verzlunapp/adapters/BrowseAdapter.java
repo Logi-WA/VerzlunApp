@@ -1,5 +1,6 @@
 package is.hi.hbv601g.verzlunapp.adapters;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +10,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import is.hi.hbv601g.verzlunapp.R;
+import is.hi.hbv601g.verzlunapp.VerzlunActivity;
+import is.hi.hbv601g.verzlunapp.databinding.FragmentCategoriesBinding;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentProductListItemBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
 
@@ -39,14 +43,12 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyViewHold
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Product currentProd = product_list.get(position);
-        /*holder.binding.productId.setText(Long.toString(currentProd.getId()));
-        holder.binding.productName.setText(currentProd.getName());
-        holder.binding.productPrice.setText(Double.toString(currentProd.getPrice()));
-        */
+
         //holder.productIndex.setText(Integer.toString(position));
         holder.productId.setText(Long.toString(currentProd.getId()));
         holder.productName.setText(currentProd.getName());
         holder.productPrice.setText(Double.toString(currentProd.getPrice()));
+
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,13 +65,15 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyViewHold
             @Override
             public void onClick(View view) {
                 System.out.println("Go to product " + currentProd.getId() + ".");
+                Bundle bundle = new Bundle();
+                Navigation.findNavController(view).navigate(R.id.viewProductFragment, bundle);
             }
         });
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private FragmentProductListItemBinding binding;
+        private FragmentCategoriesBinding binding;
         private int productIndex;
         private Long Id;
         private CardView productCard;

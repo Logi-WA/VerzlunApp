@@ -93,4 +93,13 @@
             app:argType="string"
             android:defaultValue="" />
     </fragment>
+
+    <!-- View product -->
+    <fragment
+        android:id="@+id/viewProductFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.ViewProductFragment"
+        android:label="View Product"
+        tools:layout="@layout/fragment_view_product" >
+
+    </fragment>
 </navigation>

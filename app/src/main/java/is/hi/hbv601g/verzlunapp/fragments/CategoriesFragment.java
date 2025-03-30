@@ -10,10 +10,25 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import is.hi.hbv601g.verzlunapp.R;
+import is.hi.hbv601g.verzlunapp.adapters.BrowseAdapter;
+import is.hi.hbv601g.verzlunapp.databinding.FragmentProductBrowseListBinding;
+import is.hi.hbv601g.verzlunapp.persistence.Product;
 
 public class CategoriesFragment extends Fragment {
+
+    private FragmentProductBrowseListBinding binding;
+
+    /*@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }*/
 
     @Nullable
     @Override
@@ -34,5 +49,26 @@ public class CategoriesFragment extends Fragment {
         }
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(
+            @NonNull View view,
+            @Nullable Bundle savedInstanceState
+    ) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+        // Placeholder until it is connected to the network backend
+        ArrayList<Product> products = new ArrayList<>();
+        products.add(new Product(1L, "Supergun", "Shoots with extreme precision", 99.99));
+
+        BrowseAdapter itemAdapter = new BrowseAdapter(products);
+
+        RecyclerView recyclerView = view.findViewById(R.id.productRecycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        recyclerView.setAdapter(itemAdapter);
+
     }
 }
