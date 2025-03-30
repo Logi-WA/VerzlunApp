@@ -8,18 +8,74 @@
     android:fitsSystemWindows="true"
     tools:context="is.hi.hbv601g.verzlunapp.VerzlunActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- Global Navbar -->
+    <RelativeLayout
+        android:id="@+id/globalNavbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-    </com.google.android.material.appbar.AppBarLayout>
+        android:background="@color/purple_500"
+        android:padding="10dp">
 
-    <!-- FragmentContainerView for Navigation -->
+        <ImageView
+            android:id="@+id/navMenuButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Menu"
+            android:padding="5dp"
+            android:tint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/navTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Verzla"
+            android:textSize="22sp"
+            android:textColor="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/navCartButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="96dp"
+            android:src="@drawable/ic_cart"
+            android:contentDescription="Cart"
+            android:padding="5dp"
+            android:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/navWishlistButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="48dp"
+            android:src="@drawable/ic_heart"
+            android:contentDescription="Wishlist"
+            android:padding="5dp"
+            android:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/navAccountButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_account"
+            android:contentDescription="Account"
+            android:padding="5dp"
+            android:tint="@android:color/white" />
+    </RelativeLayout>
+
+    <!-- Navigation host (fragments render here) -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="60dp"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 

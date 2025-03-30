@@ -86,5 +86,11 @@
         android:id="@+id/categoriesFragment"
         android:name="is.hi.hbv601g.verzlunapp.fragments.CategoriesFragment"
         android:label="Categories"
-        tools:layout="@layout/fragment_categories"/>
+        tools:layout="@layout/fragment_categories">
+
+        <argument
+            android:name="categoryName"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
 </navigation>
