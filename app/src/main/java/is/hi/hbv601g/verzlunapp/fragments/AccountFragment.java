@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -27,10 +29,17 @@ import androidx.navigation.Navigation;
 import java.io.IOException;
 
 import is.hi.hbv601g.verzlunapp.R;
+
 import is.hi.hbv601g.verzlunapp.databinding.FragmentAccountBinding;
+import is.hi.hbv601g.verzlunapp.services.LogoutService;
+import is.hi.hbv601g.verzlunapp.services.NetworkService;
+import is.hi.hbv601g.verzlunapp.services.UserService;
+import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
+import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 
 public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
+    private LogoutService logoutService;
 
     private ActivityResultLauncher<Intent> imageCaptureLauncher;
     private ActivityResultLauncher<Intent> imagePickLauncher;
@@ -45,12 +54,29 @@ public class AccountFragment extends Fragment {
         setupImageLaunchers();
 
         // Handle navigation
+        NetworkService networkService = NetworkServiceImpl.getInstance();
+        UserService userService = new UserServiceImpl();
+        logoutService = new LogoutService(networkService, userService);
+
+        setupUserData(userService);
+
         binding.editProfileButton.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.editProfileFragment));
         binding.changePasswordButton.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.changePasswordFragment));
-        binding.logoutButton.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.signInFragment));
+        binding.logoutButton.setOnClickListener(v -> {
+            new Thread(() -> {
+                boolean success = logoutService.logoutUser();
+                getActivity().runOnUiThread(() -> {
+                    if (success) {
+                        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
+                        Navigation.findNavController(v).navigate(R.id.signInFragment);
+                    } else {
+                        Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }).start();
+        });
 
         // Tap on profile image
         binding.profileImage.setOnClickListener(v -> {
@@ -137,6 +163,13 @@ public class AccountFragment extends Fragment {
     private void launchGalleryIntent() {
         Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imagePickLauncher.launch(pickPhoto);
+    }
+
+    private void setupUserData(UserService userService) {
+        if (userService.getCurrentUser() != null) {
+            binding.accountName.setText(userService.getCurrentUser().getName());
+            binding.accountEmail.setText(userService.getCurrentUser().getEmail());
+        }
     }
 
     @Override

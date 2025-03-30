@@ -1,12 +1,17 @@
 package is.hi.hbv601g.verzlunapp.viewmodel;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import is.hi.hbv601g.verzlunapp.persistence.User;
-import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
+import is.hi.hbv601g.verzlunapp.services.NetworkService;
+import is.hi.hbv601g.verzlunapp.services.SignUpService;
+import is.hi.hbv601g.verzlunapp.services.UserService;
+import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
+import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 
 public class SignUpViewModel extends AndroidViewModel {
     public MutableLiveData<String> name = new MutableLiveData<>();
@@ -15,11 +20,13 @@ public class SignUpViewModel extends AndroidViewModel {
     public MutableLiveData<String> errorMessage = new MutableLiveData<>();
     public MutableLiveData<Boolean> signupSuccess = new MutableLiveData<>(false);
 
-    private final UserStorage userStorage;
+    private final SignUpService signUpService;
 
     public SignUpViewModel(@NonNull Application application) {
         super(application);
-        userStorage = new UserStorage(application);
+        NetworkService networkService = NetworkServiceImpl.getInstance();
+        UserService userService = new UserServiceImpl();
+        signUpService = new SignUpService(networkService, userService);
     }
 
     public void registerUser() {
@@ -42,12 +49,15 @@ public class SignUpViewModel extends AndroidViewModel {
             return;
         }
 
-        // Save new user
+        // Create and register user through the API
         User newUser = new User(userName, userEmail, userPassword);
-        userStorage.saveUser(newUser);
+        boolean success = signUpService.registerUser(newUser);
 
-        // Reset error message on success
-        errorMessage.setValue(null);
-        signupSuccess.setValue(true);
+        if (success) {
+            errorMessage.setValue(null);
+            signupSuccess.setValue(true);
+        } else {
+            errorMessage.setValue("Registration failed. Please try again.");
+        }
     }
 }
