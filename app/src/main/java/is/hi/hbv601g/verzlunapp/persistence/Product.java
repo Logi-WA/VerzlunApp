@@ -12,6 +12,20 @@ public class Product {
 
     /* Attributes for ratings and reviews to be added later */
 
+    public Product() {}
+
+    public Product(Long id, String name, String desc, double price) {
+        this.id = id;
+        this.name = name;
+        this.description = desc;
+        this.price = price;
+    }
+
+    public Product(String name, String desc, double price) {
+        this.name = name;
+        this.description = desc;
+        this.price = price;
+    }
     private Set<Category> categories = new HashSet<>();
 
     public Long getId() { return id; }
