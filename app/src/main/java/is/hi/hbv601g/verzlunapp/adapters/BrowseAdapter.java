@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,20 +12,19 @@ import androidx.cardview.widget.CardView;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import is.hi.hbv601g.verzlunapp.R;
-import is.hi.hbv601g.verzlunapp.VerzlunActivity;
-import is.hi.hbv601g.verzlunapp.databinding.FragmentCategoriesBinding;
-import is.hi.hbv601g.verzlunapp.databinding.FragmentProductListItemBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
+import is.hi.hbv601g.verzlunapp.utils.CartManager;
+import is.hi.hbv601g.verzlunapp.utils.WishlistManager;
 
 public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyViewHolder> {
 
-    private ArrayList<Product> product_list;
+    private final List<Product> products;
 
-    public BrowseAdapter(ArrayList<Product> products) {
-        this.product_list = products;
+    public BrowseAdapter(List<Product> products) {
+        this.products = products;
     }
 
     @Override
@@ -37,54 +35,45 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyViewHold
 
     @Override
     public int getItemCount() {
-        return product_list.size();
+        return products.size();
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Product currentProd = product_list.get(position);
+        Product currentProd = products.get(position);
 
-        //holder.productIndex.setText(Integer.toString(position));
         holder.productId.setText(Long.toString(currentProd.getId()));
         holder.productName.setText(currentProd.getName());
         holder.productPrice.setText(Double.toString(currentProd.getPrice()));
 
-        holder.addToCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Add " + currentProd.getName() + " to car.");
-            }
+        holder.addToCart.setOnClickListener(v -> {
+            CartManager.getInstance().addToCart(currentProd);
+            System.out.println("Added to cart: " + currentProd.getName());
         });
-        holder.addToWishlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Add " + currentProd.getName() + " to wishlist.");
-            }
+
+        holder.addToWishlist.setOnClickListener(v -> {
+            WishlistManager.getInstance().addToWishlist(currentProd);
+            System.out.println("Add " + currentProd.getName() + " to wishlist.");
         });
-        holder.productCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Go to product " + currentProd.getId() + ".");
-                Bundle bundle = new Bundle();
-                Navigation.findNavController(view).navigate(R.id.viewProductFragment, bundle);
-            }
+
+        holder.productCard.setOnClickListener(v -> {
+            System.out.println("Go to product " + currentProd.getId() + ".");
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("product", currentProd); // optional: pass data
+            Navigation.findNavController(v).navigate(R.id.viewProductFragment, bundle);
         });
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
+        private final CardView productCard;
+        private final TextView productId;
+        private final ImageView productImage;
+        private final TextView productName;
+        private final TextView productPrice;
+        private final TextView productRating;
+        private final Button addToCart;
+        private final Button addToWishlist;
 
-        private FragmentCategoriesBinding binding;
-        private int productIndex;
-        private Long Id;
-        private CardView productCard;
-        private TextView productId;
-        private ImageView productImage;
-        private TextView productName;
-        private TextView productPrice;
-        private TextView productRating;
-
-        private Button addToCart;
-        private Button addToWishlist;
         public MyViewHolder(View itemView) {
             super(itemView);
             productId = itemView.findViewById(R.id.product_id);
@@ -92,18 +81,9 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyViewHold
             productName = itemView.findViewById(R.id.productName);
             productPrice = itemView.findViewById(R.id.productPrice);
             productRating = itemView.findViewById(R.id.productRating);
-
             addToCart = itemView.findViewById(R.id.addToCart);
             addToWishlist = itemView.findViewById(R.id.addToWishlist);
             productCard = itemView.findViewById(R.id.productCard);
-        }
-
-        public int getIndex() {
-            return productIndex;
-        }
-
-        public Long getId() {
-            return Id;
         }
     }
 }

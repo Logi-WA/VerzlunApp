@@ -1,16 +1,17 @@
 package is.hi.hbv601g.verzlunapp.persistence;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Product {
+public class Product implements Serializable {
     private Long id;
     private String name;
     private double price;
     private String imageURL;
     private String description;
 
-    /* Attributes for ratings and reviews to be added later */
+    private Set<Category> categories = new HashSet<>();
 
     public Product() {}
 
@@ -26,7 +27,6 @@ public class Product {
         this.description = desc;
         this.price = price;
     }
-    private Set<Category> categories = new HashSet<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

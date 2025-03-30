@@ -11,12 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
 import is.hi.hbv601g.verzlunapp.databinding.FragmentViewProductBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
 import is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel;
+
+import is.hi.hbv601g.verzlunapp.utils.CartManager;
+import is.hi.hbv601g.verzlunapp.utils.WishlistManager;
 
 /**
  * This fragment displays information for a given product. It contains
@@ -71,17 +75,14 @@ public class ViewProductFragment extends Fragment {
         // Add recyclerview for showing reviews later
 
         // Set onclicklisteners for the buttons to add product to cart or wishlist respectively
-        binding.AddToCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Add product to cart.");
-            }
+        binding.AddToCart.setOnClickListener(view -> {
+            CartManager.getInstance().addToCart(mProduct);
+            Toast.makeText(requireContext(), "Added to cart", Toast.LENGTH_SHORT).show();
         });
-        binding.AddToWishlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Add product to wishlist.");
-            }
+
+        binding.AddToWishlist.setOnClickListener(view -> {
+            WishlistManager.getInstance().addToWishlist(mProduct);
+            Toast.makeText(requireContext(), "Added to wishlist", Toast.LENGTH_SHORT).show();
         });
 
         return binding.getRoot();
