@@ -1,13 +1,19 @@
 package is.hi.hbv601g.verzlunapp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import android.content.Context;
+
 import androidx.test.core.app.ApplicationProvider;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.List;
-import static org.junit.Assert.*;
 
 import is.hi.hbv601g.verzlunapp.persistence.User;
 import is.hi.hbv601g.verzlunapp.persistence.UserStorage;

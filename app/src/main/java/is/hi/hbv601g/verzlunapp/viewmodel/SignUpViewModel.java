@@ -17,13 +17,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SignUpViewModel extends AndroidViewModel {
+    private final UserService userService;
     public MutableLiveData<String> name = new MutableLiveData<>();
     public MutableLiveData<String> email = new MutableLiveData<>();
     public MutableLiveData<String> password = new MutableLiveData<>();
     public MutableLiveData<String> errorMessage = new MutableLiveData<>();
     public MutableLiveData<Boolean> signupSuccess = new MutableLiveData<>(false);
-
-    private final UserService userService;
 
     public SignUpViewModel(@NonNull Application application) {
         super(application);

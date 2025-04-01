@@ -23,9 +23,16 @@ import is.hi.hbv601g.verzlunapp.persistence.Product;
 public class ProductListFragment extends Fragment {
     private FragmentProductBrowseListBinding binding;
 
+    public static ProductListFragment newInstance(List<Product> products) {
+        ProductListFragment fragment = new ProductListFragment();
+        Bundle args = new Bundle();
+
+        return fragment;
+    }
+
     @Override
-    public void onCreate(Bundle savedIsntanceState) {
-        super.onCreate(savedIsntanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             System.out.println("Arguments not null");
         }
@@ -38,13 +45,6 @@ public class ProductListFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         return inflater.inflate((R.layout.fragment_product_browse_list), container, false);
-    }
-
-    public static ProductListFragment newInstance(List<Product> products) {
-        ProductListFragment fragment = new ProductListFragment();
-        Bundle args = new Bundle();
-
-        return fragment;
     }
 
     @Override

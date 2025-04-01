@@ -16,12 +16,12 @@ import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceIm
 import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 
 public class SignInViewModel extends AndroidViewModel {
+    private final SignInService signInService;
+    private final Executor executor = Executors.newSingleThreadExecutor();
     public MutableLiveData<String> email = new MutableLiveData<>();
     public MutableLiveData<String> password = new MutableLiveData<>();
     public MutableLiveData<String> errorMessage = new MutableLiveData<>();
     public MutableLiveData<Boolean> isAuthenticated = new MutableLiveData<>(false);
-    private final SignInService signInService;
-    private final Executor executor = Executors.newSingleThreadExecutor();
     public MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
     public SignInViewModel(@NonNull Application application) {

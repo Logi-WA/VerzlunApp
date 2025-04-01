@@ -25,7 +25,7 @@ public class CartManager {
     }
 
     public List<Product> getCartItems() {
-        return new ArrayList<>(cartItems); // Optional: defensive copy
+        return new ArrayList<>(cartItems); // Defensive copy
     }
 
     public void clearCart() {

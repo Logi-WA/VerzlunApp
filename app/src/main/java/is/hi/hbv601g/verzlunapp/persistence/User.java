@@ -15,6 +15,20 @@ public class User {
         this.password = password;
     }
 
+    // Create a User from JSON
+    public static User fromJson(JSONObject json) {
+        try {
+            return new User(
+                    json.getString("name"),
+                    json.getString("email"),
+                    json.getString("password")
+            );
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     // Getters
     public String getName() {
         return name;
@@ -52,19 +66,5 @@ public class User {
             e.printStackTrace();
         }
         return json;
-    }
-
-    // Create a User from JSON
-    public static User fromJson(JSONObject json) {
-        try {
-            return new User(
-                    json.getString("name"),
-                    json.getString("email"),
-                    json.getString("password")
-            );
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

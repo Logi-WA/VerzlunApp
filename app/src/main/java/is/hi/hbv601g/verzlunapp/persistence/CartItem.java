@@ -4,21 +4,40 @@ public class CartItem {
     private Long id;
     private Product product;
     private Cart cart;
-    private int qunatity;
+    private int quantity;
 
-    public CartItem() { }
+    public CartItem() {
+    }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Product getProduct() { return product; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public void setProduct(Product product) { this.product = product; }
+    public Product getProduct() {
+        return product;
+    }
 
-    public Cart getCart() { return cart; }
-    public void setCart(Cart cart) { this.cart = cart; }
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
-    public int getQunatity() { return qunatity; }
+    public Cart getCart() {
+        return cart;
+    }
 
-    public void setQunatity(int qunatity) { this.qunatity = qunatity; }
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }

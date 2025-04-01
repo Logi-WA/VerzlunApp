@@ -4,12 +4,12 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
 
 import is.hi.hbv601g.verzlunapp.persistence.Product;
 
 public class ViewProductViewModel extends AndroidViewModel {
     private Product product;
+
     public ViewProductViewModel(@NonNull Application application) {
         super(application);
     }

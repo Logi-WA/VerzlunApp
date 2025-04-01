@@ -1,26 +1,21 @@
 package is.hi.hbv601g.verzlunapp.fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-
-import org.json.JSONObject;
-
 import is.hi.hbv601g.verzlunapp.databinding.FragmentViewProductBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
-import is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel;
-
 import is.hi.hbv601g.verzlunapp.utils.CartManager;
 import is.hi.hbv601g.verzlunapp.utils.WishlistManager;
+import is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel;
 
 /**
  * This fragment displays information for a given product. It contains
@@ -41,15 +36,13 @@ public class ViewProductFragment extends Fragment {
     }
 
     /**
-     *
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
      * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
-     *
+     *                           from a previous saved state as given here.
      * @return a view object where everything has been set
      */
     @Nullable
