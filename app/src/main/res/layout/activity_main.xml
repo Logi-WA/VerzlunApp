@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,7 +12,6 @@
         android:id="@+id/globalNavbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple_500"
         android:padding="10dp">
 
         <ImageView
@@ -22,10 +20,9 @@
             android:layout_height="32dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_menu"
             android:contentDescription="Menu"
             android:padding="5dp"
-            app:tint="@android:color/white" />
+            android:src="@drawable/menu_24px" />
 
         <TextView
             android:id="@+id/navTitle"
@@ -33,43 +30,39 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Verzla"
-            android:textSize="22sp"
-            android:textColor="@android:color/white" />
+            android:textSize="22sp" />
 
         <ImageView
             android:id="@+id/navCartButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="96dp"
-            android:src="@drawable/ic_cart"
+            android:layout_marginEnd="82dp"
             android:contentDescription="Cart"
             android:padding="5dp"
-            app:tint="@android:color/white" />
+            android:src="@drawable/shopping_cart_24px" />
 
         <ImageView
             android:id="@+id/navWishlistButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="48dp"
-            android:src="@drawable/ic_heart"
+            android:layout_marginEnd="42dp"
             android:contentDescription="Wishlist"
             android:padding="5dp"
-            app:tint="@android:color/white" />
+            android:src="@drawable/favorite_24px" />
 
         <ImageView
             android:id="@+id/navAccountButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_account"
             android:contentDescription="Account"
             android:padding="5dp"
-            app:tint="@android:color/white" />
+            android:src="@drawable/account_circle_24px" />
     </RelativeLayout>
 
-    <!-- Navigation host (fragments render here) -->
+    <!-- Navigation host -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"

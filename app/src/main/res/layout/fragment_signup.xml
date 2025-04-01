@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <variable
             name="viewModel"
             type="is.hi.hbv601g.verzlunapp.viewmodel.SignUpViewModel" />
@@ -11,15 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="@android:color/white">
+        android:padding="20dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="Sign Up"
+            android:text="@string/sign_up"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -51,12 +51,10 @@
             android:id="@+id/signupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
             android:onClick="@{() -> viewModel.registerUser()}"
-            android:backgroundTint="@color/purple_500"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:text="Sign Up"
+            android:textSize="18sp" />
 
         <!-- Navigation Link to Sign In -->
         <TextView
@@ -67,8 +65,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:text="Already have an account? Sign In"
-            android:textColor="@color/purple_500" />
+            android:text="Already have an account? Sign In" />
     </LinearLayout>
 
 </layout>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -24,27 +23,27 @@
                 android:layout_height="wrap_content"
                 android:text="Product Name"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/productPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="9999 ISK"/>
+                android:text="9999 ISK" />
 
             <TextView
                 android:id="@+id/productRating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rating: 5.0"/>
+                android:text="Rating: 5.0" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="end"
-                android:weightSum="2"
-                android:paddingTop="8dp">
+                android:orientation="horizontal"
+                android:paddingTop="8dp"
+                android:weightSum="2">
 
                 <!-- This one is hidden by default -->
                 <Button
@@ -53,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Add to Cart"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <!-- Also hidden -->
                 <Button
@@ -62,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Add to Wishlist"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/addToCartFromWishlist"
@@ -70,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Add to Cart"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/removeFromList"

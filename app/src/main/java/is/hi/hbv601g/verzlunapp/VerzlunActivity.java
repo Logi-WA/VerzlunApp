@@ -35,7 +35,7 @@ public class VerzlunActivity extends AppCompatActivity {
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
 
-            // 👇 Navbar visibility toggle logic
+            // Navbar visibility toggle logic
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 View navbar = findViewById(R.id.globalNavbar);
                 if (navbar != null) {
