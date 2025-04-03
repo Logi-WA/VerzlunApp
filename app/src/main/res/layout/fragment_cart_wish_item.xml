@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -9,74 +10,114 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:elevation="4dp">
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="3dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/productName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Product Name"
                 android:textSize="18sp"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/md_theme_onSurface"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/productPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="9999 ISK" />
-
-            <TextView
-                android:id="@+id/productRating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Rating: 5.0" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/productPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="9999 ISK"
+                    android:textColor="@color/md_theme_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/productRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:drawableStart="@drawable/thumb_up_24px"
+                    android:drawablePadding="4dp"
+                    android:drawableTint="@color/md_theme_secondary"
+                    android:gravity="center_vertical"
+                    android:text="5.0"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="8dp"
                 android:weightSum="2">
 
-                <!-- This one is hidden by default -->
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addToCartFromWishlist"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Add to Cart"
+                    android:backgroundTint="@color/md_theme_primary"
+                    android:textAllCaps="false"
+                    android:visibility="visible"
+                    app:cornerRadius="8dp"
+                    app:icon="@drawable/add_shopping_cart_24px"
+                    app:iconGravity="textStart" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/removeFromList"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginStart="8dp"
+                    android:text="Remove"
+                    android:textAllCaps="false"
+                    android:textColor="@color/md_theme_error"
+                    app:cornerRadius="8dp"
+                    app:icon="@drawable/delete_24px"
+                    app:iconGravity="textStart" />
+
+                <!-- These buttons are hidden by default -->
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/addToCart"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Add to Cart"
+                    android:textAllCaps="false"
+                    app:cornerRadius="8dp"
+                    app:icon="@drawable/add_shopping_cart_24px"
+                    app:iconGravity="textStart"
                     android:visibility="gone" />
 
-                <!-- Also hidden -->
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/addToWishlist"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Add to Wishlist"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/addToCartFromWishlist"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Add to Cart"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/removeFromList"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Remove" />
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    app:cornerRadius="8dp"
+                    app:icon="@drawable/favorite_24px"
+                    app:iconGravity="textStart" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

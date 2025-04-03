@@ -1,81 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <import type="android.view.View" />
-
         <variable
             name="viewModel"
             type="is.hi.hbv601g.verzlunapp.viewmodel.SignInViewModel" />
     </data>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:background="@color/md_theme_background"
+        android:fillViewport="true">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:text="Sign In"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-        <EditText
-            android:id="@+id/signinInputEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email Address"
-            android:inputType="textEmailAddress"
-            android:text="@={viewModel.email}" />
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="24dp"
+                android:src="@drawable/account_circle_24px"
+                android:tint="@color/md_theme_primary" />
 
-        <EditText
-            android:id="@+id/signinInputPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:text="@={viewModel.password}" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"
+                android:text="Sign In"
+                android:textColor="@color/md_theme_onBackground"
+                android:textSize="28sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/errorText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{viewModel.errorMessage}"
-            android:textColor="?attr/colorError"
-            android:visibility="@{viewModel.errorMessage != null ? View.VISIBLE : View.GONE}" />
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
 
-        <ProgressBar
-            android:id="@+id/loadingIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}" />
+                <EditText
+                    android:id="@+id/signinInputEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/md_theme_surfaceContainerLow"
+                    android:drawableStart="@drawable/alternate_email_24px"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/md_theme_primary"
+                    android:hint="Email Address"
+                    android:inputType="textEmailAddress"
+                    android:padding="16dp"
+                    android:text="@={viewModel.email}"
+                    android:textColor="@color/md_theme_onSurface" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/signinButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:enabled="@{!viewModel.isLoading}"
-            android:onClick="@{() -> viewModel.loginUser()}"
-            android:padding="10dp"
-            android:text='@{viewModel.isLoading ? "Signing In..." : "Sign In"}'
-            android:textSize="18sp" />
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:passwordToggleEnabled="true">
 
-        <TextView
-            android:id="@+id/signinToSignupLink"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:text="Don't have an account? Sign Up" />
-    </LinearLayout>
+                <EditText
+                    android:id="@+id/signinInputPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/md_theme_surfaceContainerLow"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:padding="16dp"
+                    android:text="@={viewModel.password}"
+                    android:textColor="@color/md_theme_onSurface" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/errorText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:text="@{viewModel.errorMessage}"
+                android:textColor="@color/md_theme_error"
+                android:visibility="@{viewModel.errorMessage != null ? View.VISIBLE : View.GONE}" />
+
+            <ProgressBar
+                android:id="@+id/loadingIndicator"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:indeterminateTint="@color/md_theme_primary"
+                android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/signinButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/md_theme_primary"
+                android:enabled="@{!viewModel.isLoading}"
+                android:onClick="@{() -> viewModel.loginUser()}"
+                android:padding="16dp"
+                android:text='@{viewModel.isLoading ? "Signing In..." : "Sign In"}'
+                android:textAllCaps="false"
+                android:textColor="@color/md_theme_onPrimary"
+                android:textSize="18sp"
+                app:cornerRadius="8dp" />
+
+            <TextView
+                android:id="@+id/signinToSignupLink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Don't have an account? Sign Up"
+                android:textColor="@color/md_theme_primary"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </ScrollView>
 </layout>

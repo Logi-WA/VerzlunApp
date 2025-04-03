@@ -9,10 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import is.hi.hbv601g.verzlunapp.services.NetworkService;
 import is.hi.hbv601g.verzlunapp.services.SignInService;
 import is.hi.hbv601g.verzlunapp.services.UserService;
-import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
 import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 
 public class SignInViewModel extends AndroidViewModel {
@@ -26,9 +24,8 @@ public class SignInViewModel extends AndroidViewModel {
 
     public SignInViewModel(@NonNull Application application) {
         super(application);
-        NetworkService networkService = NetworkServiceImpl.getInstance();
         UserService userService = new UserServiceImpl();
-        signInService = new SignInService(networkService, userService);
+        signInService = new SignInService(userService);
     }
 
     public void loginUser() {
