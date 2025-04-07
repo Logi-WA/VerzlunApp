@@ -1,8 +1,8 @@
 package `is`.hi.hbv601g.verzlunapp.model
 
-data class SignupResponse(
+data class GenericApiResponse<T>(
     val success: Boolean,
     val message: String?,
-    val data: UserData?,
+    val data: T?,
     val timestamp: String?
 )

@@ -1,18 +1,19 @@
 package `is`.hi.hbv601g.verzlunapp.network
 
+import `is`.hi.hbv601g.verzlunapp.model.CategoryListResponse
+import `is`.hi.hbv601g.verzlunapp.model.GenericApiResponse
 import `is`.hi.hbv601g.verzlunapp.model.LoginRequest
 import `is`.hi.hbv601g.verzlunapp.model.LoginResponse
 import `is`.hi.hbv601g.verzlunapp.model.SignupRequest
 import `is`.hi.hbv601g.verzlunapp.model.SignupResponse
-import `is`.hi.hbv601g.verzlunapp.model.CategoryListResponse
-
+import `is`.hi.hbv601g.verzlunapp.model.UserData
 import okhttp3.ResponseBody
-import retrofit2.http.Body
-import retrofit2.http.PATCH
-import retrofit2.http.POST
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
+import retrofit2.http.POST
 
 
 interface ApiService {
@@ -24,7 +25,7 @@ interface ApiService {
     fun signup(@Body signupRequest: SignupRequest): Call<SignupResponse>
 
     @PATCH("api/users/me")
-    fun updateProfile(@Body userDetails: Map<String, String>): Call<Any>
+    fun updateProfile(@Body userDetails: Map<String, String>): Call<GenericApiResponse<UserData>>
 
     @PATCH("api/users/me/password")
     fun changePassword(@Body passwordDetails: Map<String, String>): Call<ResponseBody>

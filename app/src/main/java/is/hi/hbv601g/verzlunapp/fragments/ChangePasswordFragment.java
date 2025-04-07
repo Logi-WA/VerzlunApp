@@ -1,6 +1,7 @@
 package is.hi.hbv601g.verzlunapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import is.hi.hbv601g.verzlunapp.databinding.FragmentChangePasswordBinding;
+import is.hi.hbv601g.verzlunapp.model.ApiResponseError;
 import is.hi.hbv601g.verzlunapp.network.RetrofitClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -55,40 +59,59 @@ public class ChangePasswordFragment extends Fragment {
         binding.changePasswordButton.setEnabled(false);
         binding.changePasswordButton.setText("Changing Password...");
 
-        // Create request payload
         Map<String, String> passwordDetails = new HashMap<>();
         passwordDetails.put("currentPassword", currentPassword);
         passwordDetails.put("newPassword", newPassword);
 
-        // Execute the API call with Retrofit
         Call<ResponseBody> call = RetrofitClient.INSTANCE.getApiService().changePassword(passwordDetails);
-        call.enqueue(new Callback<>() {
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                if (getActivity() == null) return;
+                if (getActivity() == null || binding == null) return; // Check fragment state
 
-                binding.changePasswordButton.setEnabled(true);
-                binding.changePasswordButton.setText("Change Password");
+                getActivity().runOnUiThread(() -> { // Ensure UI updates on main thread
+                    binding.changePasswordButton.setEnabled(true);
+                    binding.changePasswordButton.setText("Change Password");
 
-                if (response.isSuccessful()) {
-                    Toast.makeText(requireContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(requireView()).popBackStack();
-                } else {
-                    if (response.code() == 400) {
-                        Toast.makeText(requireContext(), "Current password is incorrect", Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
+                        Navigation.findNavController(requireView()).popBackStack();
                     } else {
-                        Toast.makeText(requireContext(), "Failed to change password", Toast.LENGTH_SHORT).show();
+                        // Error handling
+                        String errorMsg = "Failed to change password";
+                        if (response.errorBody() != null) {
+                            try {
+                                String errorBodyString = response.errorBody().string();
+                                Gson gson = new Gson();
+                                ApiResponseError apiError = gson.fromJson(errorBodyString, ApiResponseError.class);
+                                if (apiError != null && apiError.getMessage() != null) {
+                                    errorMsg = apiError.getMessage(); // Use backend message
+                                } else {
+                                    errorMsg += ". Server error (" + response.code() + ").";
+                                }
+                            } catch (Exception e) {
+                                Log.e("ChangePasswordFragment", "Error parsing error body", e);
+                                errorMsg += ". Server error (" + response.code() + ").";
+                            }
+                        } else {
+                            errorMsg += ". Server error (" + response.code() + ").";
+                        }
+                        Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_LONG).show();
+                        Log.e("ChangePasswordFragment", "Change password failed: " + errorMsg);
                     }
-                }
+                });
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                if (getActivity() == null) return;
+                if (getActivity() == null || binding == null) return; // Check fragment state
 
-                binding.changePasswordButton.setEnabled(true);
-                binding.changePasswordButton.setText("Change Password");
-                Toast.makeText(requireContext(), "Connection error", Toast.LENGTH_SHORT).show();
+                getActivity().runOnUiThread(() -> { // Ensure UI updates on main thread
+                    binding.changePasswordButton.setEnabled(true);
+                    binding.changePasswordButton.setText("Change Password");
+                    Toast.makeText(requireContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ChangePasswordFragment", "Change password network failure", t);
+                });
             }
         });
     }
