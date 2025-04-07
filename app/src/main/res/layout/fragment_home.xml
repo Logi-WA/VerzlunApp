@@ -169,7 +169,7 @@
                         android:layout_weight="1"
                         android:padding="16dp"
                         android:src="@drawable/shopping_cart_24px"
-                        android:tint="@color/md_theme_onSecondaryContainer" />
+                        app:tint="@color/md_theme_onSecondaryContainer" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>

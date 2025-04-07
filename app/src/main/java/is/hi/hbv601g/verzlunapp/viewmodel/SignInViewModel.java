@@ -16,6 +16,7 @@ import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 public class SignInViewModel extends AndroidViewModel {
     private final SignInService signInService;
     private final Executor executor = Executors.newSingleThreadExecutor();
+
     public MutableLiveData<String> email = new MutableLiveData<>();
     public MutableLiveData<String> password = new MutableLiveData<>();
     public MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -42,14 +43,11 @@ public class SignInViewModel extends AndroidViewModel {
             return;
         }
 
-        // Show loading state
         isLoading.setValue(true);
 
-        // Authenticate via API on background thread
         executor.execute(() -> {
             boolean success = signInService.loginUser(userEmail, userPassword);
 
-            // Update UI on main thread
             isLoading.postValue(false);
 
             if (success) {

@@ -81,6 +81,11 @@ public class AccountFragment extends Fragment {
             dispatchTakePictureIntent();
         });
 
+        binding.addProductButton.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.addProductFragment)
+        );
+
+
         return binding.getRoot();
     }
 

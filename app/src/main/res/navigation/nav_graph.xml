@@ -100,6 +100,13 @@
         android:name="is.hi.hbv601g.verzlunapp.fragments.ViewProductFragment"
         android:label="View Product"
         tools:layout="@layout/fragment_view_product">
+    </fragment>
 
+    <!-- Add Product -->
+    <fragment
+        android:id="@+id/addProductFragment"
+        android:name="is.hi.hbv601g.verzlunapp.fragments.AddProductFragment"
+        android:label="Add Product"
+        tools:layout="@layout/fragment_add_product">
     </fragment>
 </navigation>

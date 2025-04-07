@@ -1,8 +1,6 @@
 package is.hi.hbv601g.verzlunapp.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,30 +28,30 @@ public class SignInFragment extends Fragment {
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
 
-        setupObservers();
+        observeViewModel();
         setupClickListeners();
 
         return binding.getRoot();
     }
 
-    private void setupObservers() {
-        viewModel.isAuthenticated.observe(getViewLifecycleOwner(), isAuthenticated -> {
-            if (isAuthenticated != null && isAuthenticated) {
-                Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (getView() != null) { // Prevents crash if fragment is detached
-                        Navigation.findNavController(getView()).navigate(R.id.action_signInFragment_to_homeFragment);
-                    }
-                }, 500);
+    private void observeViewModel() {
+        viewModel.errorMessage.observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.isAuthenticated.observe(getViewLifecycleOwner(), authenticated -> {
+            if (authenticated != null && authenticated) {
+                Navigation.findNavController(binding.getRoot())
+                        .navigate(R.id.homeFragment); // Use correct ID from your nav_graph
             }
         });
     }
 
-
     private void setupClickListeners() {
-        binding.signinToSignupLink.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.signUpFragment);
-        });
+        binding.signinToSignupLink.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.signUpFragment));
     }
 
     @Override

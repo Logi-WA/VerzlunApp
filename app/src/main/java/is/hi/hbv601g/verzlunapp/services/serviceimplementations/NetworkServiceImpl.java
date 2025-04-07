@@ -20,8 +20,7 @@ public class NetworkServiceImpl implements NetworkService {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private String authToken;
 
-    private NetworkServiceImpl() {
-    }
+    private NetworkServiceImpl() {}
 
     public static synchronized NetworkServiceImpl getInstance() {
         if (instance == null) {
@@ -37,6 +36,8 @@ public class NetworkServiceImpl implements NetworkService {
     private void addAuthHeader(HttpURLConnection connection) {
         if (authToken != null && !authToken.isEmpty()) {
             connection.setRequestProperty("Authorization", "Bearer " + authToken);
+        } else {
+            System.err.println("Auth token is null or empty");
         }
     }
 
@@ -66,6 +67,11 @@ public class NetworkServiceImpl implements NetworkService {
 
                     int responseCode = connection.getResponseCode();
 
+                    if (responseCode == 401) {
+                        System.err.println("GET request failed with code: 401 (Unauthorized)");
+                        return null;
+                    }
+
                     if (responseCode >= 200 && responseCode < 300) {
                         StringBuilder response = new StringBuilder();
                         try (BufferedReader br = new BufferedReader(
@@ -77,6 +83,7 @@ public class NetworkServiceImpl implements NetworkService {
                         }
                         return response.toString();
                     } else {
+                        System.err.println("GET request failed with code: " + responseCode);
                         return null;
                     }
                 } catch (IOException e) {
@@ -92,32 +99,30 @@ public class NetworkServiceImpl implements NetworkService {
         }
     }
 
-
     @Override
     public String post(String endpoint, String jsonPayload) {
         try {
-            Future<String> future = executor.submit(new Callable<>() {
-                @Override
-                public String call() {
-                    try {
-                        String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
-                        URL url = new URL(BASE_URL + path);
+            Future<String> future = executor.submit(() -> {
+                try {
+                    String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
+                    URL url = new URL(BASE_URL + path);
 
-                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                        connection.setRequestMethod("POST");
-                        connection.setRequestProperty("Content-Type", "application/json");
-                        connection.setRequestProperty("Accept", "application/json");
-                        connection.setDoOutput(true);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Accept", "application/json");
+                    connection.setDoOutput(true);
 
-                        addAuthHeader(connection);
+                    addAuthHeader(connection);
 
-                        // Send payload
-                        try (OutputStream os = connection.getOutputStream()) {
-                            byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
-                            os.write(input, 0, input.length);
-                        }
+                    try (OutputStream os = connection.getOutputStream()) {
+                        byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
+                        os.write(input, 0, input.length);
+                    }
 
-                        // Read response
+                    int responseCode = connection.getResponseCode();
+
+                    if (responseCode >= 200 && responseCode < 300) {
                         StringBuilder response = new StringBuilder();
                         try (BufferedReader br = new BufferedReader(
                                 new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
@@ -126,16 +131,18 @@ public class NetworkServiceImpl implements NetworkService {
                                 response.append(responseLine.trim());
                             }
                         }
-
                         return response.toString();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else {
+                        System.err.println("POST request failed with code: " + responseCode);
                         return null;
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
                 }
             });
 
-            return future.get(); // Block until the result is available
+            return future.get();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -151,44 +158,42 @@ public class NetworkServiceImpl implements NetworkService {
                     URL url = new URL(BASE_URL + path);
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-                    connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
                     connection.setRequestMethod("PATCH");
+                    connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
                     connection.setRequestProperty("Content-Type", "application/json");
                     connection.setRequestProperty("Accept", "application/json");
                     connection.setDoOutput(true);
 
                     addAuthHeader(connection);
 
-                    // Send payload
                     try (OutputStream os = connection.getOutputStream()) {
                         byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
                         os.write(input, 0, input.length);
                     }
 
-                    // Read response
-                    StringBuilder response = new StringBuilder();
-                    try (BufferedReader br = new BufferedReader(
-                            new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                        String responseLine;
-                        while ((responseLine = br.readLine()) != null) {
-                            response.append(responseLine.trim());
-                        }
-                    }
+                    int responseCode = connection.getResponseCode();
 
-                    return response.toString();
-                } catch (
-                        IOException e) {
-                    if (e instanceof java.io.FileNotFoundException) {
-                        System.err.println("File not found: " + e.getMessage());
+                    if (responseCode >= 200 && responseCode < 300) {
+                        StringBuilder response = new StringBuilder();
+                        try (BufferedReader br = new BufferedReader(
+                                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                            String responseLine;
+                            while ((responseLine = br.readLine()) != null) {
+                                response.append(responseLine.trim());
+                            }
+                        }
+                        return response.toString();
                     } else {
-                        e.printStackTrace();
+                        System.err.println("PATCH request failed with code: " + responseCode);
+                        return null;
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                     return null;
                 }
             });
 
-            return future.get(); // Block until the result is available
+            return future.get();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

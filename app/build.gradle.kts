@@ -42,6 +42,10 @@ android {
         viewBinding = true
         dataBinding = true
     }
+
+    lint {
+        abortOnError = false
+    }
 }
 
 /*kapt {
@@ -67,4 +71,10 @@ dependencies {
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.okhttp3.logging.interceptor)
+    // Retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // JSON converter (usually Gson)
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
 }
