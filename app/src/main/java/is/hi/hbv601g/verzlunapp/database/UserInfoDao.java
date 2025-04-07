@@ -6,9 +6,6 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import io.reactivex.Completable;
-import io.reactivex.Single;
-
 @Dao
 public interface UserInfoDao {
     @Query("SELECT * FROM userInfo WHERE uid = 1")
