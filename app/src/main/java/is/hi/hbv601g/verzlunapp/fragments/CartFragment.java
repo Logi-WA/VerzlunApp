@@ -71,11 +71,15 @@ public class CartFragment extends Fragment {
     private void applyDiscount() {
         String code = discountCodeInput.getText().toString().trim();
 
-        if (code.equalsIgnoreCase("VERZLA10")) {
+        if (code.equalsIgnoreCase("VERZLA5")) {
+            currentTotal = originalTotal * 0.95;
+            Toast.makeText(getContext(), "5% discount applied!", Toast.LENGTH_SHORT).show();
+        } else if (code.equalsIgnoreCase("VERZLA10")) {
             currentTotal = originalTotal * 0.90;
             Toast.makeText(getContext(), "10% discount applied!", Toast.LENGTH_SHORT).show();
         } else if (code.equalsIgnoreCase("VERZLA20")) {
             currentTotal = originalTotal * 0.80;
+            Toast.makeText(getContext(), "20% discount applied!", Toast.LENGTH_SHORT).show();
         } else {
             currentTotal = originalTotal;
             Toast.makeText(getContext(), "Invalid discount code.", Toast.LENGTH_SHORT).show();
