@@ -59,4 +59,9 @@ public class SignInViewModel extends AndroidViewModel {
             }
         });
     }
+
+    public void fillIn(String em, String pass) {
+        email.setValue(em);
+        password.setValue(pass);
+    }
 }
