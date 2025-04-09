@@ -11,18 +11,17 @@ class UserInfoDatabaseHandler(val db : UserInfoDatabase) {
     var uid = db.userInfoDao()
 
     fun getUserInfo() : UserInfo {
-        println("getting user")
         var ui : UserInfo
         runBlocking {
             ui = uid.getUserInfo()
         }
-        println(ui.email)
-        println(ui.password)
         return ui
     }
 
     fun insertUserInfo(ui: UserInfo) {
-        print("sending user")
+        println("sending user")
+        println(ui.email)
+        println(ui.password)
         runBlocking { uid.insertUserInfo(ui) }
     }
 

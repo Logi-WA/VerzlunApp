@@ -12,9 +12,9 @@ interface UserInfoDao {
     suspend fun getUserInfo(): UserInfo
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUserInfo(vararg ui: UserInfo)
+    suspend fun insertUserInfo(vararg ui: UserInfo) : Void
 
     @Delete
-    suspend fun deleteUserInfo(vararg ui: UserInfo)
+    suspend fun deleteUserInfo(vararg ui: UserInfo) : Void
 
 }
