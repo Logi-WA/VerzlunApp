@@ -10,10 +10,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.room.Room;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import is.hi.hbv601g.verzlunapp.database.UserInfo;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabase;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabaseHandler;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentChangePasswordBinding;
 import is.hi.hbv601g.verzlunapp.network.RetrofitClient;
 import okhttp3.ResponseBody;
@@ -23,12 +27,14 @@ import retrofit2.Response;
 
 public class ChangePasswordFragment extends Fragment {
     private FragmentChangePasswordBinding binding;
-
+    private UserInfoDatabaseHandler dbh;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentChangePasswordBinding.inflate(inflater, container, false);
         binding.changePasswordButton.setOnClickListener(v -> changePassword());
+        UserInfoDatabase db = Room.databaseBuilder(getActivity().getApplicationContext(), UserInfoDatabase.class, "user_db").build();
+        dbh = new UserInfoDatabaseHandler(db);
         return binding.getRoot();
     }
 
@@ -72,6 +78,9 @@ public class ChangePasswordFragment extends Fragment {
 
                 if (response.isSuccessful()) {
                     Toast.makeText(requireContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
+                    UserInfo ui = dbh.getUserInfo();
+                    ui = new UserInfo(1, ui.getEmail(), newPassword);
+                    dbh.insertUserInfo(ui);
                     Navigation.findNavController(requireView()).popBackStack();
                 } else {
                     if (response.code() == 400) {

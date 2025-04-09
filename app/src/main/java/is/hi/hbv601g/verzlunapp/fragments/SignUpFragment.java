@@ -13,23 +13,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.room.Room;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import is.hi.hbv601g.verzlunapp.R;
+import is.hi.hbv601g.verzlunapp.database.UserInfo;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabase;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabaseHandler;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentSignupBinding;
 import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
 
 public class SignUpFragment extends Fragment {
     private FragmentSignupBinding binding;
     private static final String TAG = "SignUpFragment";
+    private UserInfoDatabaseHandler dbh;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentSignupBinding.inflate(inflater, container, false);
         setupClickListeners();
+        UserInfoDatabase db = Room.databaseBuilder(getActivity().getApplicationContext(), UserInfoDatabase.class, "user_db").build();
+        dbh = new UserInfoDatabaseHandler(db);
         return binding.getRoot();
     }
 
@@ -38,7 +45,9 @@ public class SignUpFragment extends Fragment {
                 Navigation.findNavController(binding.getRoot()).navigate(R.id.signInFragment)
         );
 
+        System.out.println("setting up listeners");
         binding.signupButton.setOnClickListener(v -> {
+            System.out.println("Signing up!");
             String name = binding.signupInputName.getText().toString().trim();
             String email = binding.signupInputEmail.getText().toString().trim();
             String password = binding.signupInputPassword.getText().toString().trim();
@@ -72,6 +81,9 @@ public class SignUpFragment extends Fragment {
 
                         requireActivity().runOnUiThread(() -> {
                             showToast("Signup successful!");
+                            UserInfo ui = new UserInfo(1, email, password);
+                            dbh.insertUserInfo(ui);
+
                             Navigation.findNavController(binding.getRoot()).navigate(R.id.homeFragment);
                         });
                     } catch (JSONException e) {

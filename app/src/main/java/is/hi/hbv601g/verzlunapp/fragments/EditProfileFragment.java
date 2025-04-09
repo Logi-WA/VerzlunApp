@@ -10,11 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.room.Room;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import is.hi.hbv601g.verzlunapp.R;
+import is.hi.hbv601g.verzlunapp.database.UserInfo;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabase;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabaseHandler;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentEditProfileBinding;
 import is.hi.hbv601g.verzlunapp.network.RetrofitClient;
 import is.hi.hbv601g.verzlunapp.persistence.User;
@@ -30,6 +34,7 @@ public class EditProfileFragment extends Fragment {
     private FragmentEditProfileBinding binding;
     private UserService userService;
     private NetworkService networkService;
+    private UserInfoDatabaseHandler dbh;
 
     @Nullable
     @Override
@@ -39,6 +44,8 @@ public class EditProfileFragment extends Fragment {
         userService = new UserServiceImpl();
         populateUserData();
         binding.saveChangesButton.setOnClickListener(v -> updateUserProfile());
+        UserInfoDatabase db = Room.databaseBuilder(getActivity().getApplicationContext(), UserInfoDatabase.class, "user_db").build();
+        dbh = new UserInfoDatabaseHandler(db);
         return binding.getRoot();
     }
 
@@ -94,6 +101,9 @@ public class EditProfileFragment extends Fragment {
             binding.emailInput.setError("Enter a valid email address");
             return;
         }
+
+        UserInfo ui = new UserInfo(1, email, dbh.getUserInfo().getPassword());
+        dbh.insertUserInfo(ui);
 
         // Loading state
         binding.saveChangesButton.setEnabled(false);
