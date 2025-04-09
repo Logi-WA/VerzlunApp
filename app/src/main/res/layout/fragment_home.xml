@@ -55,42 +55,6 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/fragment_category_list_item" />
 
-            <!-- Promotion Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/promotionCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                app:cardBackgroundColor="@color/md_theme_tertiaryContainer"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        style="@style/TextAppearance.Material3.TitleLarge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Big Summer Sale!"
-                        android:textColor="@color/md_theme_onTertiaryContainer" />
-
-                    <TextView
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Up to 50% off on selected items."
-                        android:textColor="@color/md_theme_onTertiaryContainer" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
             <!-- Featured Products Section -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -115,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="View All"
+                    android:text="View all products"
                     android:textColor="@color/md_theme_primary" />
             </LinearLayout>
 

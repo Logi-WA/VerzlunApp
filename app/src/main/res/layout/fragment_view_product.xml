@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"> <!-- Added tools namespace -->
 
     <data>
         <import type="android.view.View" />
-        <variable
-            name="viewModel"
-            type="is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel" />
+        <!-- Remove ViewModel binding if not directly used -->
+        <!-- <variable name="viewModel" type="is.hi.hbv601g.verzlunapp.viewmodel.ViewProductViewModel" /> -->
     </data>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/md_theme_background"
         android:fillViewport="true">
 
-        <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -24,9 +24,9 @@
             <ImageView
                 android:id="@+id/ProductPicture"
                 android:layout_width="match_parent"
-                android:layout_height="240dp"
+                android:layout_height="280dp"
                 android:background="@color/md_theme_surfaceContainerLow"
-                android:scaleType="fitCenter" />
+                android:scaleType="centerInside" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,30 +34,31 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Product Name -->
                 <TextView
                     android:id="@+id/ProductName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Product Name"
+                    android:layout_marginBottom="8dp"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textColor="@color/md_theme_onBackground"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    tools:text="Product Name" />
 
+                <!-- Price & Rating -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/ProductPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="9999 ISK"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
                         android:textColor="@color/md_theme_primary"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        tools:text="€99.99" />
 
                     <TextView
                         android:id="@+id/ProductRating"
@@ -68,33 +69,76 @@
                         android:drawablePadding="4dp"
                         android:drawableTint="@color/md_theme_secondary"
                         android:gravity="center_vertical"
-                        android:text="4.5"
-                        android:textSize="16sp" />
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        tools:text="4.5" />
                 </LinearLayout>
 
+                <!-- Brand (NEW) -->
                 <TextView
+                    android:id="@+id/productBrandLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:text="Brand:"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/productBrand"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/md_theme_onSurface"
+                    tools:text="Awesome Brand Inc." />
+
+                <!-- Description -->
+                <TextView
+                    android:id="@+id/productDescriptionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:text="Description"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
                     android:textColor="@color/md_theme_onSurfaceVariant"
-                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/ProductDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:text="Product description goes here with all the details about this amazing product that you should definitely buy."
+                    android:layout_marginBottom="16dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="@color/md_theme_onSurfaceVariant"
-                    android:textSize="16sp" />
+                    tools:text="Product description goes here..." />
 
+
+                <!-- Tags (NEW) -->
+                <TextView
+                    android:id="@+id/productTagsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Tags"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/productTagsChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="4dp" />
+
+                <!-- Add to Cart / Wishlist Buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
+                    android:layout_marginBottom="24dp"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/AddToCart"
@@ -102,30 +146,68 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/md_theme_primary"
-                        android:padding="12dp"
                         android:text="@string/add_to_cart"
                         android:textAllCaps="false"
-                        app:cornerRadius="8dp"
                         app:icon="@drawable/add_shopping_cart_24px"
                         app:iconGravity="textStart" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/AddToWishlist"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:padding="12dp"
                         android:text="@string/add_to_wishlist"
                         android:textAllCaps="false"
-                        android:textColor="@color/md_theme_onSurfaceVariant"
-                        app:cornerRadius="8dp"
                         app:icon="@drawable/favorite_24px"
                         app:iconGravity="textStart" />
                 </LinearLayout>
+
+                <!-- Reviews Section (NEW) -->
+                <TextView
+                    android:id="@+id/productReviewsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Reviews"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="@color/md_theme_onSurface"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/reviewsProgressBar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/reviewsEmptyMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="No reviews yet. Be the first!"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reviewsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/fragment_review_item" />
+                <!-- tools:listitem needs fragment_review_item.xml -->
+
+                <!-- TODO: Add "Write a Review" Button/Section later -->
+
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </layout>

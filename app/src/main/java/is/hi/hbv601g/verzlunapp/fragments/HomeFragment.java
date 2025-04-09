@@ -30,22 +30,25 @@ import is.hi.hbv601g.verzlunapp.viewmodel.HomeViewModel;
 public class HomeFragment extends Fragment implements CategoryAdapter.OnCategoryClickListener, FeaturedProductAdapter.OnProductClickListener {
 
     private FragmentHomeBinding binding;
-    private static final String TAG = "HomeFragment";
     private HomeViewModel viewModel;
     private CategoryAdapter categoryAdapter;
     private FeaturedProductAdapter featuredProductAdapter;
-    // Adapters for dynamic category lists
+
+    // Adapters for the dynamic category lists
     private FeaturedProductAdapter categoryProductAdapter1;
     private FeaturedProductAdapter categoryProductAdapter2;
-    // Add more so amount is = MAX_CATEGORIES_ON_HOME (in HomeViewModel)
-    // Also add in setupRecyclerViews()
     private FeaturedProductAdapter categoryProductAdapter3;
+    // Add more if MAX_CATEGORIES_ON_HOME is larger
+
+    private static final String TAG = "HomeFragment";
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // Set ViewModel for DataBinding ONLY if you use it directly in XML (like for the progress bar visibility)
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner()); // Important for LiveData observers
 
@@ -53,22 +56,24 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
         setupObservers();
         setupClickListeners();
 
+        // Optional: Trigger a refresh if needed, but ViewModel usually fetches on init
+        // viewModel.fetchInitialData();
 
         return binding.getRoot();
     }
 
     private void setupRecyclerViews() {
-        // Top Categories RecyclerView
+        // Top Categories RecyclerView (Horizontal)
         categoryAdapter = new CategoryAdapter(this);
         binding.categoriesRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.categoriesRecycler.setAdapter(categoryAdapter);
 
-        // Featured Products RecyclerView
+        // Featured Products RecyclerView (Horizontal)
         featuredProductAdapter = new FeaturedProductAdapter(this);
         binding.featuredProductsRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.featuredProductsRecycler.setAdapter(featuredProductAdapter);
 
-        // --- Setup for the Category Product Lists ---
+        // --- Setup for the new Category Product Lists ---
         // List 1
         categoryProductAdapter1 = new FeaturedProductAdapter(this);
         binding.categoryRecycler1.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -84,7 +89,7 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
         binding.categoryRecycler3.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.categoryRecycler3.setAdapter(categoryProductAdapter3);
 
-        // Add more here
+        // Add more if needed
     }
 
     private void setupObservers() {
@@ -102,14 +107,14 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
             }
         });
 
-        // --- Observe Category Product Lists ---
+        // --- Observe NEW Category Product Lists ---
         viewModel.categoryProductLists.observe(getViewLifecycleOwner(), categoryLists -> {
             Log.d(TAG, "Observed category product lists update. Count: " + (categoryLists != null ? categoryLists.size() : 0));
             // Hide all sections initially
             binding.categorySection1.setVisibility(View.GONE);
             binding.categorySection2.setVisibility(View.GONE);
             binding.categorySection3.setVisibility(View.GONE);
-            // Add more here
+            // Add more if needed
 
             if (categoryLists != null && !categoryLists.isEmpty()) {
                 // Populate Section 1 if data exists
@@ -136,16 +141,17 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
                     binding.categorySection3.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Populating Section 3: " + list3.first + " with " + list3.second.size() + " products.");
                 }
-                // Add more 'if' blocks so blocks = MAX_CATEGORIES_ON_HOME
+                // Add more 'if' blocks if MAX_CATEGORIES_ON_HOME is larger
             } else {
                 Log.d(TAG, "Category product list is null or empty. Hiding sections.");
             }
         });
 
 
-        // Observe loading state
+        // Observe loading state (binds directly to progressBar via XML)
         viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             Log.d(TAG, "Loading state: " + isLoading);
+            // Visibility handled by data binding in XML
         });
 
         // Observe error messages
@@ -153,6 +159,7 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
                 Log.e(TAG, "Error displayed: " + error);
+                // Optionally clear error in ViewModel after showing
             }
         });
     }
@@ -175,10 +182,13 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
     }
 
     private void setupClickListeners() {
+        // Handle "View All" click for products (navigate to CategoriesFragment with no specific category)
         binding.viewAllProducts.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Navigate to All Products", Toast.LENGTH_SHORT).show();
             Bundle bundle = new Bundle();
-            bundle.putString("categoryName", "All Products");
+            // Pass a special value or null/empty string to indicate "All"
+            bundle.putString("categoryName", "All Products"); // Or handle null in CategoriesFragment
+            // Make sure this action exists in nav_graph.xml from home to categories
             try {
                 Navigation.findNavController(v).navigate(R.id.action_home_to_categories, bundle);
             } catch (IllegalArgumentException e) {
@@ -187,12 +197,11 @@ public class HomeFragment extends Fragment implements CategoryAdapter.OnCategory
             }
         });
 
-        binding.promotionCard.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Promotion clicked!", Toast.LENGTH_SHORT).show();
-        });
     }
 
     // --- Implementation of Adapter Click Listeners ---
+    // These listeners now apply to clicks from *any* of the product adapters
+
     @Override
     public void onCategoryClick(Category category) {
         Toast.makeText(getContext(), "Category clicked: " + category.getName(), Toast.LENGTH_SHORT).show();

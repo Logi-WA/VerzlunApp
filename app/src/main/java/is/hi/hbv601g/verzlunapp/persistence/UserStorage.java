@@ -14,6 +14,10 @@ public class UserStorage {
     private static final String PREFS_NAME = "user_prefs";
     private static final String USERS_KEY = "users";
 
+    private static final String LOGGED_IN_USER_ID_KEY = "logged_in_user_id";
+    private static final String LOGGED_IN_USER_NAME_KEY = "logged_in_user_name";
+    private static final String LOGGED_IN_USER_EMAIL_KEY = "logged_in_user_email";
+
     private SharedPreferences sharedPreferences;
 
     public UserStorage(Context context) {

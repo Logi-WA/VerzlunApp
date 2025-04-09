@@ -15,15 +15,19 @@ import is.hi.hbv601g.verzlunapp.persistence.Category;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
     private List<Category> categories = new ArrayList<>();
-    private OnCategoryClickListener listener;
+    private final OnCategoryClickListener listener;
+
+    public interface OnCategoryClickListener {
+        void onCategoryClick(Category category);
+    }
 
     public CategoryAdapter(OnCategoryClickListener listener) {
         this.listener = listener;
     }
 
-    public void setCategories(List<Category> newCategories) {
-        this.categories = newCategories;
-        notifyDataSetChanged(); // DiffUtil later?
+    public void setCategories(List<Category> categories) {
+        this.categories = categories != null ? categories : new ArrayList<>();
+        notifyDataSetChanged(); // Consider DiffUtil later
     }
 
     @NonNull
@@ -45,26 +49,38 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         return categories.size();
     }
 
-    // Interface for click events
-    public interface OnCategoryClickListener {
-        void onCategoryClick(Category category);
-    }
-
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
         private final FragmentCategoryListItemBinding binding;
 
-        CategoryViewHolder(FragmentCategoryListItemBinding binding) {
+        public CategoryViewHolder(FragmentCategoryListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
         void bind(final Category category, final OnCategoryClickListener listener) {
-            binding.categoryName.setText(category.getName());
-            binding.getRoot().setOnClickListener(v -> {
+            // Capitalize the name here before setting it
+            binding.categoryName.setText(capitalize(category.getName()));
+            binding.categoryCard.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onCategoryClick(category);
                 }
             });
+        }
+
+        // Add the capitalize helper method directly inside the ViewHolder or the Adapter
+        private static String capitalize(String s) {
+            if (s == null || s.isEmpty()) {
+                return s;
+            }
+            String[] words = s.replace('-', ' ').split("\\s");
+            StringBuilder capitalized = new StringBuilder();
+            for (String word : words) {
+                if (word.length() > 0) {
+                    capitalized.append(Character.toUpperCase(word.charAt(0)))
+                            .append(word.substring(1).toLowerCase()).append(" ");
+                }
+            }
+            return capitalized.toString().trim();
         }
     }
 }

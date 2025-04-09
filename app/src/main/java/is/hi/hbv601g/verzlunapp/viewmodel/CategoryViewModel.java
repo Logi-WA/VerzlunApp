@@ -76,18 +76,7 @@ public class CategoryViewModel extends AndroidViewModel {
                     if (productDataList != null) {
                         // Convert ProductData to Product
                         List<Product> productList = productDataList.stream()
-                                .map(data -> {
-                                    Product prod = new Product();
-                                    prod.setId(data.getId());
-                                    prod.setName(data.getName());
-                                    prod.setPrice(data.getPrice());
-                                    prod.setDescription(data.getDescription());
-                                    prod.setRating(data.getRating());
-                                    prod.setBrand(data.getBrand());
-                                    prod.setTags(data.getTags() != null ? new ArrayList<>(data.getTags()) : new ArrayList<>());
-                                    prod.setCategoryName(data.getCategoryName());
-                                    return prod;
-                                })
+                                .map(CategoryViewModel::mapProductDataToProduct)
                                 .collect(Collectors.toList());
                         _products.postValue(productList);
                         Log.i(TAG, "Successfully fetched " + productList.size() + " products for " + categoryName);
@@ -111,5 +100,62 @@ public class CategoryViewModel extends AndroidViewModel {
                 currentCategoryName = null; // Reset category on failure so it retries next time
             }
         });
+    }
+
+    public void fetchAllProducts() {
+        currentCategoryName = "All Products"; // Store this state identifier
+        _isLoading.setValue(true);
+        _errorMessage.setValue(null);
+        _products.setValue(Collections.emptyList()); // Clear previous
+
+        Log.i(TAG, "Fetching all products...");
+
+        // Call API with null category filter
+        apiService.getProducts(null).enqueue(new Callback<GenericApiResponse<List<ProductData>>>() {
+            @Override
+            public void onResponse(@NonNull Call<GenericApiResponse<List<ProductData>>> call, @NonNull Response<GenericApiResponse<List<ProductData>>> response) {
+                _isLoading.postValue(false);
+                if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
+                    List<ProductData> productDataList = response.body().getData();
+                    if (productDataList != null) {
+                        List<Product> productList = productDataList.stream()
+                                .map(CategoryViewModel::mapProductDataToProduct) // Reuse or create mapping
+                                .collect(Collectors.toList());
+                        _products.postValue(productList);
+                        Log.i(TAG, "Successfully fetched " + productList.size() + " products (All).");
+                    } else {
+                        _products.postValue(Collections.emptyList());
+                        Log.i(TAG, "No products found (All).");
+                    }
+                } else {
+                    Log.e(TAG, "Failed to fetch all products: " + response.code());
+                    _errorMessage.postValue("Failed to load products");
+                    _products.postValue(Collections.emptyList());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GenericApiResponse<List<ProductData>>> call, @NonNull Throwable t) {
+                _isLoading.postValue(false);
+                Log.e(TAG, "Network error fetching all products", t);
+                _errorMessage.postValue("Network Error: " + t.getMessage());
+                _products.postValue(Collections.emptyList());
+                currentCategoryName = null; // Reset state on failure
+            }
+        });
+    }
+
+    private static Product mapProductDataToProduct(ProductData data) {
+        Product prod = new Product();
+        prod.setId(data.getId());
+        prod.setName(data.getName());
+        prod.setPrice(data.getPrice());
+        prod.setDescription(data.getDescription());
+        prod.setRating(data.getRating());
+        prod.setBrand(data.getBrand());
+        prod.setTags(data.getTags() != null ? new ArrayList<>(data.getTags()) : new ArrayList<>());
+        prod.setCategoryName(data.getCategoryName());
+        // Add image URL mapping if needed
+        return prod;
     }
 }

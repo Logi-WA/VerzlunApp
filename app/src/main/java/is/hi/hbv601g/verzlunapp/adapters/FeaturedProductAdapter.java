@@ -97,6 +97,12 @@ public class FeaturedProductAdapter extends RecyclerView.Adapter<FeaturedProduct
                 }
             });
 
+            binding.addToWishlistHorizontal.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onAddToWishlistClick(product);
+                }
+            });
+
             // Click listener for the whole card
             binding.productCardHorizontal.setOnClickListener(v -> {
                 if (listener != null) listener.onProductClick(product);

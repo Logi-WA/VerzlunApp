@@ -46,25 +46,28 @@ public class CategoriesFragment extends Fragment implements BrowseAdapter.OnProd
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCategoriesBinding.inflate(inflater, container, false);
-        binding.setLifecycleOwner(getViewLifecycleOwner()); // Set lifecycle owner for LiveData
+        binding.setLifecycleOwner(getViewLifecycleOwner());
 
         setupRecyclerView();
         updateTitle();
-        setupObservers(); // Observe ViewModel data
+        setupObservers();
 
-        if (!"All Products".equals(categoryName)) {
-            Log.d(TAG, "Fetching products for category: " + categoryName);
-            viewModel.fetchProductsByCategory(categoryName);
+        // --- Fetching Logic ---
+        if ("All Products".equals(categoryName)) {
+            Log.d(TAG, "Fetching ALL products based on categoryName.");
+            binding.emptyCategoryMessage.setVisibility(View.GONE); // Hide message initially
+            viewModel.fetchAllProducts(); // Call the new method
+        } else if (categoryName != null && !categoryName.isEmpty()) {
+            Log.d(TAG, "Fetching products for specific category: " + categoryName);
+            binding.emptyCategoryMessage.setVisibility(View.GONE); // Hide message initially
+            viewModel.fetchProductsByCategory(categoryName); // Fetch for specific category
         } else {
-            Log.d(TAG, "Displaying 'All Products'");
-            // TODO: fetch all products if categoryName is "All Products"
-            // For now, it will show nothing or require modification in ViewModel/API call
-            Toast.makeText(getContext(), "Showing 'All Products' view", Toast.LENGTH_LONG).show();
+            // Handle case where categoryName is null or unexpectedly empty if needed
+            Log.w(TAG, "categoryName is null or empty, not fetching.");
             binding.categoryProgressBar.setVisibility(View.GONE);
-            binding.emptyCategoryMessage.setText("Select a category to view products.");
+            binding.emptyCategoryMessage.setText("No category selected.");
             binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
         }
-
 
         return binding.getRoot();
     }
@@ -80,27 +83,40 @@ public class CategoriesFragment extends Fragment implements BrowseAdapter.OnProd
     }
 
     private void updateTitle() {
-        binding.categoryName.setText("Category: " + categoryName);
+        binding.categoryName.setText(capitalize(categoryName));
+    }
+
+    private String capitalize(String s) {
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
+        String[] words = s.replace('-', ' ').split("\\s");
+        StringBuilder capitalized = new StringBuilder();
+        for (String word : words) {
+            if (word.length() > 0) {
+                capitalized.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase()).append(" ");
+            }
+        }
+        return capitalized.toString().trim();
     }
 
     private void setupObservers() {
-        // Observe the list of products for this category
         viewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
-            binding.emptyCategoryMessage.setVisibility(View.GONE);
+            binding.emptyCategoryMessage.setVisibility(View.GONE); // Hide msg
             if (products != null) {
-                Log.d(TAG, "Updating product adapter with " + products.size() + " items for category: " + categoryName);
+                Log.d(TAG, "Updating adapter. Product count: " + products.size() + " for: " + categoryName);
                 productGridAdapter.setProducts(products);
-                if (products.isEmpty() && !"All Products".equals(categoryName)) {
-                    binding.emptyCategoryMessage.setText("No products found in this category.");
+                if (products.isEmpty()) {
+                    // Show empty message whether it's "All" or specific category
+                    binding.emptyCategoryMessage.setText("No products found.");
                     binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
                 }
             } else {
-                Log.d(TAG, "Received null product list for category: " + categoryName);
-                if (!"All Products".equals(categoryName)) {
-                    binding.emptyCategoryMessage.setText("Could not load products.");
-                    binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
-                }
-                productGridAdapter.setProducts(new ArrayList<>()); // Clear adapter on null
+                Log.d(TAG, "Received null product list for: " + categoryName);
+                binding.emptyCategoryMessage.setText("Could not load products.");
+                binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
+                productGridAdapter.setProducts(new ArrayList<>()); // Clear adapter
             }
         });
 

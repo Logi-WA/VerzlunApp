@@ -6,6 +6,8 @@ import `is`.hi.hbv601g.verzlunapp.model.GenericApiResponse
 import `is`.hi.hbv601g.verzlunapp.model.LoginRequest
 import `is`.hi.hbv601g.verzlunapp.model.LoginResponse
 import `is`.hi.hbv601g.verzlunapp.model.ProductData
+import `is`.hi.hbv601g.verzlunapp.model.ReviewData
+import `is`.hi.hbv601g.verzlunapp.model.ReviewRequest
 import `is`.hi.hbv601g.verzlunapp.model.SignupRequest
 import `is`.hi.hbv601g.verzlunapp.model.SignupResponse
 import `is`.hi.hbv601g.verzlunapp.model.UserData
@@ -17,6 +19,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Query
+import java.util.UUID
 
 
 interface ApiService {
@@ -43,4 +46,14 @@ interface ApiService {
 
     @GET("api/categories")
     fun getCategories(): Call<GenericApiResponse<List<CategoryData>>>
+
+    @GET("api/reviews") // Endpoint for fetching reviews
+    fun getReviews(
+        @Query("productId") productId: UUID // Use @Query for query parameter
+    ): Call<GenericApiResponse<List<ReviewData>>>
+
+    @POST("api/reviews") // Endpoint for posting a new review
+    fun postReview(
+        @Body reviewRequest: ReviewRequest
+    ): Call<GenericApiResponse<ReviewData>> // Assuming API returns the created review
 }
