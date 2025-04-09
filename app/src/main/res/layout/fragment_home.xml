@@ -1,177 +1,236 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
             name="viewModel"
             type="is.hi.hbv601g.verzlunapp.viewmodel.HomeViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/md_theme_background"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="16dp"
+            tools:context=".fragments.HomeFragment">
 
-            <!-- Hero Section -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+            <!-- Progress Bar -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/md_theme_primaryContainer">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="24dp"
-                        android:text="Verzla"
-                        android:textColor="@color/md_theme_onPrimaryContainer"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_margin="24dp"
-                        android:text="Discover amazing products"
-                        android:textColor="@color/md_theme_onPrimaryContainer"
-                        android:textSize="18sp" />
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Categories Section -->
+            <!-- Top Categories Section -->
             <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Categories"
-                android:textColor="@color/md_theme_onBackground"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="Shop by Category" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/categoriesRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:paddingBottom="16dp" />
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/fragment_category_list_item" />
 
-            <!-- Featured Products -->
+            <!-- Promotion Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/promotionCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:cardBackgroundColor="@color/md_theme_tertiaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Big Summer Sale!"
+                        android:textColor="@color/md_theme_onTertiaryContainer" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Up to 50% off on selected items."
+                        android:textColor="@color/md_theme_onTertiaryContainer" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Featured Products Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Featured Products"
-                    android:textColor="@color/md_theme_onBackground"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:text="Featured Products" />
 
                 <TextView
                     android:id="@+id/viewAllProducts"
+                    style="@style/TextAppearance.Material3.LabelLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp"
                     android:text="View All"
-                    android:textColor="@color/md_theme_primary"
-                    android:textSize="16sp" />
+                    android:textColor="@color/md_theme_primary" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/featuredProductsRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
+                android:orientation="horizontal"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:paddingBottom="8dp" />
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/fragment_product_horizontal_item" />
 
-            <!-- Promotions Section -->
-            <TextView
+            <!-- ====== DYNAMIC CATEGORY SECTIONS ====== -->
+
+            <!-- Category Section 1 -->
+            <LinearLayout
+                android:id="@+id/category_section_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Special Offers"
-                android:textColor="@color/md_theme_onBackground"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible"> <!-- Hide initially, make visible when data loads -->
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/promotionCard"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="24dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/category_title_1"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/md_theme_secondaryContainer"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    tools:text="Category 1 Name" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="2"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/category_recycler_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/fragment_product_horizontal_item" />
+            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Summer Sale"
-                            android:textColor="@color/md_theme_onSecondaryContainer"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
+            <!-- Category Section 2 -->
+            <LinearLayout
+                android:id="@+id/category_section_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Up to 50% off on selected items"
-                            android:textColor="@color/md_theme_onSecondaryContainer"
-                            android:textSize="16sp" />
-                    </LinearLayout>
+                <TextView
+                    android:id="@+id/category_title_2"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    tools:text="Category 2 Name" />
 
-                    <ImageView
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:padding="16dp"
-                        android:src="@drawable/shopping_cart_24px"
-                        app:tint="@color/md_theme_onSecondaryContainer" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/category_recycler_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/fragment_product_horizontal_item" />
+            </LinearLayout>
+
+            <!-- Category Section 3 -->
+            <LinearLayout
+                android:id="@+id/category_section_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/category_title_3"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    tools:text="Category 3 Name" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/category_recycler_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/fragment_product_horizontal_item" />
+            </LinearLayout>
+
+            <!-- Add more sections so sections = MAX_CATEGORIES_ON_HOME -->
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

@@ -41,9 +41,14 @@
         <action
             android:id="@+id/action_home_to_categories"
             app:destination="@id/categoriesFragment" />
+
         <action
             android:id="@+id/action_home_to_account"
             app:destination="@id/accountFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_viewProductFragment"
+            app:destination="@id/viewProductFragment" />
     </fragment>
 
     <!-- Cart -->
@@ -88,6 +93,9 @@
         android:label="Categories"
         tools:layout="@layout/fragment_categories">
 
+        <action
+            android:id="@+id/action_categoriesFragment_to_viewProductFragment"
+            app:destination="@id/viewProductFragment" />
         <argument
             android:name="categoryName"
             android:defaultValue=""

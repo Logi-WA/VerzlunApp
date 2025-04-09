@@ -1,39 +1,30 @@
 package is.hi.hbv601g.verzlunapp.persistence;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class Product implements Serializable {
-    private Long id;
+    private static final String IMAGE_BASE_URL = "https://verzla-cloud.s3.eu-north-1.amazonaws.com/products/";
     private String name;
-    private double price;
-    private String imageURL;
+    private UUID id;
     private String description;
-
-    private Set<Category> categories = new HashSet<>();
+    private Double price;
+    private Double rating;
+    private String brand;
+    private List<String> tags = new ArrayList<>();
+    private String categoryName;
 
     public Product() {
     }
 
-    public Product(Long id, String name, String desc, double price) {
-        this.id = id;
-        this.name = name;
-        this.description = desc;
-        this.price = price;
-    }
-
-    public Product(String name, String desc, double price) {
-        this.name = name;
-        this.description = desc;
-        this.price = price;
-    }
-
-    public Long getId() {
+    // --- Getters and Setters ---
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -45,20 +36,12 @@ public class Product implements Serializable {
         this.name = name;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public String getImageURL() {
-        return imageURL;
-    }
-
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
     }
 
     public String getDescription() {
@@ -69,11 +52,46 @@ public class Product implements Serializable {
         this.description = description;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Double getRating() {
+        return rating;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    // --- Helper methods for Image URLs ---
+    public String getThumbnailUrl() {
+        if (id == null) return null;
+        return IMAGE_BASE_URL + id.toString() + "/thumbnail.webp";
+    }
+
+    public String getPosterUrl() {
+        if (id == null) return null;
+        return IMAGE_BASE_URL + id.toString() + "/poster.webp";
     }
 }

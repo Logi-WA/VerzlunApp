@@ -1,74 +1,158 @@
 package is.hi.hbv601g.verzlunapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import java.util.ArrayList;
 
 import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.adapters.BrowseAdapter;
-import is.hi.hbv601g.verzlunapp.databinding.FragmentProductBrowseListBinding;
+import is.hi.hbv601g.verzlunapp.adapters.CategoryProductGridAdapter;
+import is.hi.hbv601g.verzlunapp.databinding.FragmentCategoriesBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
+import is.hi.hbv601g.verzlunapp.utils.CartManager;
+import is.hi.hbv601g.verzlunapp.utils.WishlistManager;
+import is.hi.hbv601g.verzlunapp.viewmodel.CategoryViewModel;
 
-public class CategoriesFragment extends Fragment {
+public class CategoriesFragment extends Fragment implements BrowseAdapter.OnProductClickListener {
 
-    private FragmentProductBrowseListBinding binding;
+    private static final String TAG = "CategoriesFragment";
+    private FragmentCategoriesBinding binding;
+    private String categoryName = "All Products";
+    private CategoryProductGridAdapter productGridAdapter;
+    private CategoryViewModel viewModel;
 
-    /*@Override
-    public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-    }*/
+        if (getArguments() != null && getArguments().containsKey("categoryName")) {
+            categoryName = getArguments().getString("categoryName", "All Products");
+        }
+        viewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_categories, container, false);
+        binding = FragmentCategoriesBinding.inflate(inflater, container, false);
+        binding.setLifecycleOwner(getViewLifecycleOwner()); // Set lifecycle owner for LiveData
 
-        Bundle args = getArguments();
-        if (args != null && args.containsKey("categoryName")) {
-            String categoryName = args.getString("categoryName");
+        setupRecyclerView();
+        updateTitle();
+        setupObservers(); // Observe ViewModel data
 
-            // You can fetch and display products for this category here
-            Toast.makeText(requireContext(), "Category: " + categoryName, Toast.LENGTH_SHORT).show();
-
-            TextView categoryTitle = view.findViewById(R.id.category_name);
-            categoryTitle.setText("Products in: " + categoryName);
-
-            // TODO: Populate product list based on categoryName
+        if (!"All Products".equals(categoryName)) {
+            Log.d(TAG, "Fetching products for category: " + categoryName);
+            viewModel.fetchProductsByCategory(categoryName);
+        } else {
+            Log.d(TAG, "Displaying 'All Products'");
+            // TODO: fetch all products if categoryName is "All Products"
+            // For now, it will show nothing or require modification in ViewModel/API call
+            Toast.makeText(getContext(), "Showing 'All Products' view", Toast.LENGTH_LONG).show();
+            binding.categoryProgressBar.setVisibility(View.GONE);
+            binding.emptyCategoryMessage.setText("Select a category to view products.");
+            binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
         }
 
-        return view;
+
+        return binding.getRoot();
+    }
+
+    private void setupRecyclerView() {
+        productGridAdapter = new CategoryProductGridAdapter(this);
+
+        // Use GridLayoutManager with 2 columns
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+        binding.productRecycler.setLayoutManager(layoutManager);
+
+        binding.productRecycler.setAdapter(productGridAdapter);
+    }
+
+    private void updateTitle() {
+        binding.categoryName.setText("Category: " + categoryName);
+    }
+
+    private void setupObservers() {
+        // Observe the list of products for this category
+        viewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
+            binding.emptyCategoryMessage.setVisibility(View.GONE);
+            if (products != null) {
+                Log.d(TAG, "Updating product adapter with " + products.size() + " items for category: " + categoryName);
+                productGridAdapter.setProducts(products);
+                if (products.isEmpty() && !"All Products".equals(categoryName)) {
+                    binding.emptyCategoryMessage.setText("No products found in this category.");
+                    binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
+                }
+            } else {
+                Log.d(TAG, "Received null product list for category: " + categoryName);
+                if (!"All Products".equals(categoryName)) {
+                    binding.emptyCategoryMessage.setText("Could not load products.");
+                    binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
+                }
+                productGridAdapter.setProducts(new ArrayList<>()); // Clear adapter on null
+            }
+        });
+
+        // Observe loading state
+        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            Log.d(TAG, "Loading state changed: " + isLoading);
+            binding.categoryProgressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (isLoading) {
+                binding.emptyCategoryMessage.setVisibility(View.GONE);
+            }
+        });
+
+        // Observe error messages
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                Log.e(TAG, "Error received: " + error);
+                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                binding.emptyCategoryMessage.setText("Error: " + error);
+                binding.emptyCategoryMessage.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    // --- Implementation of BrowseAdapter.OnProductClickListener ---
+    @Override
+    public void onProductClick(Product product) {
+        Toast.makeText(getContext(), "Product clicked: " + product.getName(), Toast.LENGTH_SHORT).show();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("product", product);
+        try {
+            Navigation.findNavController(requireView()).navigate(R.id.action_categoriesFragment_to_viewProductFragment, bundle);
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Navigation action_categoriesFragment_to_viewProductFragment not found or invalid.", e);
+            Toast.makeText(getContext(), "Cannot view product details.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void onViewCreated(
-            @NonNull View view,
-            @Nullable Bundle savedInstanceState
-    ) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onAddToCartClick(Product product) {
+        CartManager.getInstance().addToCart(product);
+        Toast.makeText(getContext(), product.getName() + " added to cart", Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void onAddToWishlistClick(Product product) {
+        WishlistManager.getInstance().addToWishlist(product);
+        Toast.makeText(getContext(), product.getName() + " added to wishlist", Toast.LENGTH_SHORT).show();
+    }
 
-        // Placeholder until it is connected to the network backend
-        ArrayList<Product> products = new ArrayList<>();
-        products.add(new Product(1L, "Supergun", "Shoots with extreme precision", 99.99));
-
-        BrowseAdapter itemAdapter = new BrowseAdapter(products);
-
-        RecyclerView recyclerView = view.findViewById(R.id.productRecycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        recyclerView.setAdapter(itemAdapter);
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

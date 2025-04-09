@@ -4,37 +4,56 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.adapters.BrowseAdapter;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentProductBrowseListBinding;
 import is.hi.hbv601g.verzlunapp.persistence.Product;
+import is.hi.hbv601g.verzlunapp.utils.CartManager;
+import is.hi.hbv601g.verzlunapp.utils.WishlistManager;
 
+public class ProductListFragment extends Fragment implements BrowseAdapter.OnProductClickListener {
 
-public class ProductListFragment extends Fragment {
     private FragmentProductBrowseListBinding binding;
+    private BrowseAdapter itemAdapter;
+    private List<Product> products = new ArrayList<>();
 
-    public static ProductListFragment newInstance(List<Product> products) {
+    public static ProductListFragment newInstance(ArrayList<Product> products) {
         ProductListFragment fragment = new ProductListFragment();
         Bundle args = new Bundle();
-
+        args.putSerializable("products", products);
+        fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            System.out.println("Arguments not null");
+            Serializable serializable = getArguments().getSerializable("products");
+            if (serializable instanceof ArrayList) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Product> passedProducts = (ArrayList<Product>) serializable;
+                if (passedProducts != null) {
+                    this.products.addAll(passedProducts);
+                }
+            } else {
+                System.out.println("Arguments found but 'products' key is missing or not an ArrayList.");
+                // TODO: Initialize products list some other way
+            }
+        } else {
+            System.out.println("Arguments are null.");
+            // TODO: Initialize products list some other way
         }
     }
 
@@ -44,7 +63,8 @@ public class ProductListFragment extends Fragment {
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate((R.layout.fragment_product_browse_list), container, false);
+        binding = FragmentProductBrowseListBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -53,17 +73,38 @@ public class ProductListFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Placeholder data
-        //ProdList pl = new ProdList();
-        //ArrayList<Product> products = pl.products;
-        ArrayList<Product> products = new ArrayList<>();
+        itemAdapter = new BrowseAdapter(this.products, this);
 
-        BrowseAdapter itemAdapter = new BrowseAdapter(products);
+        binding.productRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.productRecycler.setAdapter(itemAdapter);
 
-        RecyclerView recyclerView = view.findViewById(R.id.productRecycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        recyclerView.setAdapter(itemAdapter);
+        // TODO: If products weren't passed via arguments, fetch them here using a ViewModel
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @Override
+    public void onProductClick(Product product) {
+        Toast.makeText(getContext(), "Product clicked: " + product.getName(), Toast.LENGTH_SHORT).show();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("product", product);
+
+        Toast.makeText(getContext(), "Navigate to product view (Action ID needed)", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAddToCartClick(Product product) {
+        CartManager.getInstance().addToCart(product);
+        Toast.makeText(getContext(), product.getName() + " added to cart", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAddToWishlistClick(Product product) {
+        WishlistManager.getInstance().addToWishlist(product);
+        Toast.makeText(getContext(), product.getName() + " added to wishlist", Toast.LENGTH_SHORT).show();
+    }
 }

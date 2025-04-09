@@ -52,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:drawableStart="@drawable/thumb_up_24px"
+                    android:drawableStart="@drawable/star_24px"
                     android:drawablePadding="4dp"
                     android:drawableTint="@color/md_theme_secondary"
                     android:gravity="center_vertical"
