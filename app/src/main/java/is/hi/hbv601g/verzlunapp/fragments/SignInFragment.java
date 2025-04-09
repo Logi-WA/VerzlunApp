@@ -11,14 +11,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.room.Room;
 
 import is.hi.hbv601g.verzlunapp.R;
+import is.hi.hbv601g.verzlunapp.database.UserInfo;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabase;
+import is.hi.hbv601g.verzlunapp.database.UserInfoDatabaseHandler;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentSigninBinding;
 import is.hi.hbv601g.verzlunapp.viewmodel.SignInViewModel;
 
 public class SignInFragment extends Fragment {
     private FragmentSigninBinding binding;
     private SignInViewModel viewModel;
+
+    private UserInfoDatabaseHandler dbh;
 
     @Nullable
     @Override
@@ -30,6 +36,15 @@ public class SignInFragment extends Fragment {
 
         observeViewModel();
         setupClickListeners();
+
+        UserInfoDatabase db = Room.databaseBuilder(getActivity().getApplicationContext(), UserInfoDatabase.class, "user_db").build();
+        dbh = new UserInfoDatabaseHandler(db);
+        UserInfo ui = dbh.getUserInfo();
+
+        if (ui != null) {
+            System.out.println("Not null");
+            viewModel.fillIn(ui.getEmail(), ui.getPassword());
+        }
 
         return binding.getRoot();
     }
@@ -43,6 +58,21 @@ public class SignInFragment extends Fragment {
 
         viewModel.isAuthenticated.observe(getViewLifecycleOwner(), authenticated -> {
             if (authenticated != null && authenticated) {
+                UserInfo ui =  new UserInfo(
+                        1,
+                        binding.signinInputEmail.getText().toString(),
+                        binding.signinInputPassword.getText().toString());
+
+                dbh.insertUserInfo(ui);
+                UserInfo ui2 = dbh.getUserInfo();
+
+                if (ui2 != null) {
+                    System.out.println("Email: " + ui.getEmail() + "\tPassword: " + ui.getPassword());
+                }
+                else {
+                    System.out.println("Null");
+                }
+
                 Navigation.findNavController(binding.getRoot())
                         .navigate(R.id.homeFragment); // Use correct ID from your nav_graph
             }
