@@ -8,6 +8,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private String authToken;
 
     public User(String userId, String name, String email, String password) {
         this.userId = userId;
@@ -42,17 +43,21 @@ public class User {
         return name;
     }
 
-    // Setters
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    // Setters
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public void setName(String name) {
@@ -67,13 +72,16 @@ public class User {
         this.password = password;
     }
 
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         try {
             json.put("userId", userId);
             json.put("name", name);
             json.put("email", email);
-            json.put("password", password);
         } catch (JSONException e) {
             e.printStackTrace();
         }

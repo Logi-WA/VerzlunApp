@@ -168,7 +168,7 @@ public class ViewProductViewModel extends AndroidViewModel {
                 rating,
                 comment.trim(),
                 currentUser.getName(), // Get name from logged-in user
-                currentUser.getUsername() // Get email (username) from logged-in user
+                currentUser.getEmail() // Get email (username) from logged-in user
         );
 
         Log.d(TAG, "Submitting review: " + request.toString());

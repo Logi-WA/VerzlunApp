@@ -49,7 +49,7 @@ public class VerzlunActivity extends AppCompatActivity {
         }
 
         setupNavbarListeners();
-        initializeSampleUsers();
+//        initializeSampleUsers();
     }
 
     private void setupNavbarListeners() {
@@ -85,7 +85,7 @@ public class VerzlunActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeSampleUsers() {
+    /*private void initializeSampleUsers() {
         UserStorage storage = new UserStorage(this);
         if (!storage.getUsers().isEmpty()) return;
 
@@ -103,5 +103,5 @@ public class VerzlunActivity extends AppCompatActivity {
         } catch (Resources.NotFoundException | IOException | JSONException e) {
             Log.e("VerzlunActivity", "Failed to load sample users", e);
         }
-    }
+    }*/
 }
