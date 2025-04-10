@@ -19,72 +19,93 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import is.hi.hbv601g.verzlunapp.R;
 import is.hi.hbv601g.verzlunapp.databinding.FragmentAccountBinding;
+import is.hi.hbv601g.verzlunapp.persistence.User;
+import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
 import is.hi.hbv601g.verzlunapp.services.LogoutService;
-import is.hi.hbv601g.verzlunapp.services.NetworkService;
-import is.hi.hbv601g.verzlunapp.services.UserService;
-import is.hi.hbv601g.verzlunapp.services.serviceimplementations.NetworkServiceImpl;
-import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
 
 public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
     private LogoutService logoutService;
+    private static final String TAG = "AccountFragment";
+    private final Executor executor = Executors.newSingleThreadExecutor();
+    private UserStorage userStorage;
 
     private ActivityResultLauncher<Intent> imageCaptureLauncher;
     private ActivityResultLauncher<Intent> imagePickLauncher;
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
+    private NavController navController;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        userStorage = new UserStorage(requireContext());
+        logoutService = new LogoutService(requireContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "AccountFragment onResume: Refreshing user data display.");
+        setupUserData();
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
 
-        // Setup image intent launchers
         setupImageLaunchers();
 
-        // Handle navigation
-        NetworkService networkService = NetworkServiceImpl.getInstance();
-        UserService userService = new UserServiceImpl();
-        logoutService = new LogoutService(networkService, userService);
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
-        setupUserData(userService);
+        setupUserData();
 
         binding.editProfileButton.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.editProfileFragment));
+                navController.navigate(R.id.action_accountFragment_to_editProfileFragment));
         binding.changePasswordButton.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.changePasswordFragment));
+                navController.navigate(R.id.action_accountFragment_to_changePasswordFragment));
+        binding.addProductButton.setOnClickListener(v ->
+                navController.navigate(R.id.action_accountFragment_to_addProductFragment));
+
         binding.logoutButton.setOnClickListener(v -> {
-            new Thread(() -> {
-                boolean success = logoutService.logoutUser();
-                getActivity().runOnUiThread(() -> {
-                    if (success) {
-                        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(v).navigate(R.id.signInFragment);
-                    } else {
-                        Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }).start();
+            Log.d("AccountFragment", "Logout button clicked");
+
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Logout")
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Logout", (dialog, which) -> {
+
+                        logoutService.performLogout();
+
+                        try {
+                            navController.navigate(R.id.action_accountFragment_to_signInFragment);
+                            Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                        } catch (IllegalArgumentException e) {
+                            Log.e("AccountFragment", "Navigation to signInFragment failed.", e);
+                            Toast.makeText(requireContext(), "Logout complete, navigation failed.", Toast.LENGTH_SHORT).show();
+                        }
+
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
-        // Tap on profile image
         binding.profileImage.setOnClickListener(v -> {
             Log.d("AccountFragment", "Profile image clicked");
-            dispatchTakePictureIntent();
+            showImageSourceDialog();
         });
-
-        binding.addProductButton.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.addProductFragment)
-        );
-
 
         return binding.getRoot();
     }
@@ -117,7 +138,6 @@ public class AccountFragment extends Fragment {
                     }
                 });
 
-        // Request permission for CAMERA
         requestCameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
@@ -129,21 +149,12 @@ public class AccountFragment extends Fragment {
                 });
     }
 
-    private void dispatchTakePictureIntent() {
+    private void showImageSourceDialog() {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Choose option")
+                .setTitle("Update Profile Picture")
                 .setItems(new CharSequence[]{"Take Photo", "Choose from Gallery"}, (dialog, which) -> {
                     if (which == 0) {
-                        // Check permission before launching camera
-                        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(requireActivity(),
-                                    new String[]{Manifest.permission.CAMERA},
-                                    100);
-                            return; // Wait for user to grant permission
-                        } else {
-                            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
-                        }
+                        handleCameraOption();
                     } else {
                         launchGalleryIntent();
                     }
@@ -151,14 +162,25 @@ public class AccountFragment extends Fragment {
                 .show();
     }
 
+    private void handleCameraOption() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        } else {
+
+            launchCameraIntent();
+        }
+    }
+
     private void launchCameraIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
         if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
             imageCaptureLauncher.launch(takePictureIntent);
         } else {
-            Log.e("AccountFragment", "Camera intent could not be resolved");
+            Log.e("AccountFragment", "No camera app found");
             Toast.makeText(requireContext(), "Camera not available", Toast.LENGTH_SHORT).show();
-            Log.e("AccountFragment", "Camera intent could not be resolved");
         }
     }
 
@@ -167,10 +189,18 @@ public class AccountFragment extends Fragment {
         imagePickLauncher.launch(pickPhoto);
     }
 
-    private void setupUserData(UserService userService) {
-        if (userService.getCurrentUser() != null) {
-            binding.accountName.setText(userService.getCurrentUser().getName());
-            binding.accountEmail.setText(userService.getCurrentUser().getEmail());
+    private void setupUserData() {
+        User currentUser = userStorage.getLoggedInUser();
+        if (currentUser != null) {
+            binding.accountName.setText(currentUser.getName() != null ? currentUser.getName() : "N/A");
+            binding.accountEmail.setText(currentUser.getEmail());
+
+        } else {
+
+            binding.accountName.setText("Error");
+            binding.accountEmail.setText("Not logged in");
+            Log.e("AccountFragment", "User is null in AccountFragment, redirecting to login.");
+
         }
     }
 

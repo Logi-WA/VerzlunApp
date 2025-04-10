@@ -25,43 +25,51 @@ import is.hi.hbv601g.verzlunapp.model.UserData;
 import is.hi.hbv601g.verzlunapp.network.ApiService;
 import is.hi.hbv601g.verzlunapp.network.RetrofitClient;
 import is.hi.hbv601g.verzlunapp.persistence.User;
-import is.hi.hbv601g.verzlunapp.services.UserService;
-import is.hi.hbv601g.verzlunapp.services.serviceimplementations.UserServiceImpl;
+import is.hi.hbv601g.verzlunapp.persistence.UserStorage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class EditProfileFragment extends Fragment {
     private FragmentEditProfileBinding binding;
-    private UserService userService;
-    //    private NetworkService networkService;
+
+    private UserStorage userStorage;
     private static final String TAG = "EditProfileFragment";
     private ApiService apiService;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        userStorage = new UserStorage(requireContext());
+        apiService = RetrofitClient.INSTANCE.getApiService();
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
-        // networkService = NetworkServiceImpl.getInstance(); // Remove
-        userService = new UserServiceImpl();
-        apiService = RetrofitClient.INSTANCE.getApiService(); // Get ApiService instance
 
-        populateUserData(); // Populate fields initially
+        populateUserData();
         binding.saveChangesButton.setOnClickListener(v -> updateUserProfile());
+
         return binding.getRoot();
     }
 
     private void populateUserData() {
-        User currentUser = userService.getCurrentUser();
+        User currentUser = userStorage.getLoggedInUser();
         if (currentUser != null) {
             binding.nameInput.setText(currentUser.getName());
             binding.emailInput.setText(currentUser.getEmail());
         } else {
-            // Handle case where user data isn't available (e.g., fetch again or navigate back)
-            Log.w(TAG, "Current user data not found in UserService. Navigating back.");
-            Toast.makeText(requireContext(), "User data not available.", Toast.LENGTH_SHORT).show();
-            // Optional: Navigate back if user data is essential here
-            // Navigation.findNavController(requireView()).popBackStack();
+            Log.e(TAG, "Current user data not found in UserStorage. Cannot edit profile.");
+            Toast.makeText(requireContext(), "Error: User data not available. Please log in again.", Toast.LENGTH_LONG).show();
+
+            if (getView() != null) {
+                Navigation.findNavController(getView()).popBackStack();
+
+            }
         }
     }
 
@@ -78,7 +86,14 @@ public class EditProfileFragment extends Fragment {
             return;
         }
 
-        // Loading state
+        User currentUserBeforeUpdate = userStorage.getLoggedInUser();
+        if (currentUserBeforeUpdate != null &&
+                name.equals(currentUserBeforeUpdate.getName()) &&
+                email.equals(currentUserBeforeUpdate.getEmail())) {
+            Toast.makeText(requireContext(), "No changes detected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         binding.saveChangesButton.setEnabled(false);
         binding.saveChangesButton.setText("Saving...");
 
@@ -91,39 +106,54 @@ public class EditProfileFragment extends Fragment {
         call.enqueue(new Callback<GenericApiResponse<UserData>>() {
             @Override
             public void onResponse(@NonNull Call<GenericApiResponse<UserData>> call, @NonNull Response<GenericApiResponse<UserData>> response) {
-                if (getActivity() == null || binding == null) return; // Check fragment state
 
-                getActivity().runOnUiThread(() -> { // Ensure UI updates on main thread
+                if (getActivity() == null || binding == null) {
+                    Log.w(TAG, "Fragment detached during API response.");
+                    return;
+                }
+
+                getActivity().runOnUiThread(() -> {
                     binding.saveChangesButton.setEnabled(true);
                     binding.saveChangesButton.setText("Save Changes");
 
                     if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
-                        // Profile updated successfully on backend
-                        UserData updatedUserData = response.body().getData();
+                        UserData updatedApiData = response.body().getData();
+                        User currentUser = userStorage.getLoggedInUser();
 
-                        if (updatedUserData != null) {
-                            // Update current user in memory with data from response
-                            User currentUser = userService.getCurrentUser();
-                            if (currentUser != null) {
-                                currentUser.setName(updatedUserData.getName());
-                                currentUser.setEmail(updatedUserData.getEmail());
-                                // ID doesn't change, keep existing ID
-                                userService.setCurrentUser(currentUser);
-                                Log.i(TAG, "User profile updated locally.");
+                        if (currentUser != null && updatedApiData != null) {
+                            User updatedUserForStorage = new User(
+                                    currentUser.getUserId(),
+                                    updatedApiData.getName(),
+                                    updatedApiData.getEmail(),
+                                    ""
+                            );
+                            updatedUserForStorage.setAuthToken(currentUser.getAuthToken());
+
+                            userStorage.saveLoggedInUser(updatedUserForStorage);
+                            Log.i(TAG, "User profile updated in UserStorage.");
+
+                            Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+
+                            if (getView() != null) {
+                                Navigation.findNavController(getView()).popBackStack();
                             }
+
                         } else {
-                            Log.w(TAG, "Profile updated on backend, but no user data returned in response.");
+
+                            Log.e(TAG, "Failed to update UserStorage. CurrentUser: " + (currentUser != null) + ", UpdatedApiData: " + (updatedApiData != null));
+                            Toast.makeText(requireContext(), "Update successful but failed to save locally.", Toast.LENGTH_LONG).show();
+                            if (getView() != null) {
+                                Navigation.findNavController(getView()).popBackStack();
+                            }
                         }
 
-                        Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(binding.getRoot()).popBackStack();
                     } else {
-                        // Handle unsuccessful HTTP responses
+
                         String error = "Update failed. ";
-                        if (response.code() == 409) { // Conflict - Email likely exists
+                        if (response.code() == 409) {
                             error = "Email address already in use.";
                         } else if (response.body() != null && response.body().getMessage() != null) {
-                            error = response.body().getMessage(); // Use backend message
+                            error = response.body().getMessage();
                         } else if (response.errorBody() != null) {
                             try {
                                 String errorBodyString = response.errorBody().string();
@@ -149,9 +179,13 @@ public class EditProfileFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<GenericApiResponse<UserData>> call, @NonNull Throwable t) {
-                if (getActivity() == null || binding == null) return; // Check fragment state
 
-                getActivity().runOnUiThread(() -> { // Ensure UI updates on main thread
+                if (getActivity() == null || binding == null) {
+                    Log.w(TAG, "Fragment detached during API failure.");
+                    return;
+                }
+
+                getActivity().runOnUiThread(() -> {
                     binding.saveChangesButton.setEnabled(true);
                     binding.saveChangesButton.setText("Save Changes");
                     Toast.makeText(requireContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();

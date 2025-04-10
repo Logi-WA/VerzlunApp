@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -32,12 +34,11 @@ public class ViewProductViewModel extends AndroidViewModel {
 
     private static final String TAG = "ViewProductViewModel";
     private final ApiService apiService;
-    private final UserStorage userStorage; // To get logged-in user info
+    private final UserStorage userStorage;
 
     private final MutableLiveData<Product> _product = new MutableLiveData<>();
-    public LiveData<Product> product = _product; // LiveData for the product itself
+    public LiveData<Product> product = _product;
 
-    // --- Review LiveData ---
     private final MutableLiveData<List<Review>> _reviews = new MutableLiveData<>(new ArrayList<>());
     public LiveData<List<Review>> reviews = _reviews;
 
@@ -47,7 +48,6 @@ public class ViewProductViewModel extends AndroidViewModel {
     private final MutableLiveData<String> _reviewsError = new MutableLiveData<>();
     public LiveData<String> reviewsError = _reviewsError;
 
-    // --- Review Submission LiveData ---
     private final MutableLiveData<Boolean> _isSubmittingReview = new MutableLiveData<>(false);
     public LiveData<Boolean> isSubmittingReview = _isSubmittingReview;
 
@@ -57,25 +57,46 @@ public class ViewProductViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> _submitReviewSuccess = new MutableLiveData<>(false);
     public LiveData<Boolean> submitReviewSuccess = _submitReviewSuccess;
 
-
     public ViewProductViewModel(@NonNull Application application) {
         super(application);
         apiService = RetrofitClient.INSTANCE.getApiService();
-        userStorage = new UserStorage(application); // Initialize user storage
+        userStorage = new UserStorage(application);
     }
 
-    // Method to set the product when the fragment receives it
+    private static Review mapReviewDataToReview(ReviewData data) {
+        Review review = new Review();
+        review.setReviewId(data.getReviewId());
+        review.setProductId(data.getProductId());
+        review.setRating(data.getRating());
+        review.setComment(data.getComment());
+        review.setReviewerName(data.getReviewerName());
+        if (data.getDate() != null) {
+            try {
+
+                OffsetDateTime odt = OffsetDateTime.parse(data.getDate());
+
+                review.setDate(Date.from(odt.toInstant()));
+            } catch (DateTimeParseException e) {
+                Log.e(TAG, "Failed to parse date string: " + data.getDate(), e);
+                review.setDate(null);
+            }
+        } else {
+            review.setDate(null);
+        }
+
+        return review;
+    }
+
     public void setProduct(Product product) {
         _product.setValue(product);
-        // Fetch reviews automatically when product is set
+
         if (product != null && product.getId() != null) {
             fetchReviews(product.getId());
         } else {
-            _reviews.setValue(Collections.emptyList()); // Clear reviews if no product
+            _reviews.setValue(Collections.emptyList());
         }
     }
 
-    // --- Review Fetching ---
     public void fetchReviews(UUID productId) {
         if (productId == null) {
             _reviewsError.setValue("Product ID is missing.");
@@ -91,14 +112,14 @@ public class ViewProductViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
                     List<ReviewData> reviewDataList = response.body().getData();
                     if (reviewDataList != null) {
-                        // Map ReviewData to Review (Persistence/UI model)
+
                         List<Review> reviewList = reviewDataList.stream()
                                 .map(ViewProductViewModel::mapReviewDataToReview)
                                 .collect(Collectors.toList());
                         _reviews.postValue(reviewList);
                         Log.i(TAG, "Successfully fetched " + reviewList.size() + " reviews.");
                     } else {
-                        _reviews.postValue(Collections.emptyList()); // No reviews found
+                        _reviews.postValue(Collections.emptyList());
                         Log.i(TAG, "No reviews found for product: " + productId);
                     }
                 } else {
@@ -111,34 +132,16 @@ public class ViewProductViewModel extends AndroidViewModel {
             @Override
             public void onFailure(@NonNull Call<GenericApiResponse<List<ReviewData>>> call, @NonNull Throwable t) {
                 _isReviewsLoading.postValue(false);
-                Log.e(TAG, "Network error fetching reviews", t);
-                _reviewsError.postValue("Network Error: " + t.getMessage());
+                Log.e(TAG, "Error fetching or parsing reviews", t);
+                _reviewsError.postValue("Network/Parsing Error: " + t.getMessage());
                 _reviews.postValue(Collections.emptyList());
             }
         });
     }
 
-    // Helper to map API data model to UI model
-    private static Review mapReviewDataToReview(ReviewData data) {
-        Review review = new Review();
-        review.setReviewId(data.getReviewId());
-        review.setProductId(data.getProductId());
-        review.setRating(data.getRating());
-        review.setComment(data.getComment());
-        review.setReviewerName(data.getReviewerName());
-        // Convert OffsetDateTime to Date (handle potential null)
-        if (data.getDate() != null) {
-            review.setDate(Date.from(data.getDate().toInstant()));
-        } else {
-            review.setDate(null); // Or set to new Date() if preferred
-        }
-        return review;
-    }
-
-    // --- Review Submission ---
     public void submitReview(int rating, String comment) {
         Product currentProduct = _product.getValue();
-        User currentUser = userStorage.getLoggedInUser(); // Get current user
+        User currentUser = userStorage.getLoggedInUser();
 
         if (currentProduct == null || currentProduct.getId() == null) {
             _submitReviewError.setValue("Product information is missing.");
@@ -146,11 +149,6 @@ public class ViewProductViewModel extends AndroidViewModel {
         }
         if (currentUser == null) {
             _submitReviewError.setValue("You must be logged in to submit a review.");
-            // TODO: Trigger login flow?
-            return;
-        }
-        if (comment == null || comment.trim().isEmpty()) {
-            _submitReviewError.setValue("Review comment cannot be empty.");
             return;
         }
         if (rating < 1 || rating > 5) {
@@ -162,13 +160,14 @@ public class ViewProductViewModel extends AndroidViewModel {
         _submitReviewError.setValue(null);
         _submitReviewSuccess.setValue(false);
 
-        // Create the request object - Use logged-in user's details
+        String finalComment = (comment != null) ? comment.trim() : "";
+
         ReviewRequest request = new ReviewRequest(
                 currentProduct.getId(),
                 rating,
-                comment.trim(),
-                currentUser.getName(), // Get name from logged-in user
-                currentUser.getEmail() // Get email (username) from logged-in user
+                finalComment,
+                currentUser.getName(),
+                currentUser.getEmail()
         );
 
         Log.d(TAG, "Submitting review: " + request.toString());
@@ -180,13 +179,13 @@ public class ViewProductViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
                     Log.i(TAG, "Review submitted successfully!");
                     _submitReviewSuccess.postValue(true);
-                    // Refresh reviews list after successful submission
+
                     fetchReviews(currentProduct.getId());
                 } else {
-                    // Try to parse error body if possible, otherwise use generic message
+
                     String errorMsg = "Failed to submit review (Code: " + response.code() + ")";
                     Log.e(TAG, errorMsg);
-                    // You might parse error response body here if backend provides details
+
                     _submitReviewError.postValue(errorMsg);
                 }
             }
@@ -200,7 +199,6 @@ public class ViewProductViewModel extends AndroidViewModel {
         });
     }
 
-    // Method to reset submission status after UI handles it
     public void resetSubmitStatus() {
         _submitReviewSuccess.setValue(false);
         _submitReviewError.setValue(null);

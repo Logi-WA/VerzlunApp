@@ -1,5 +1,6 @@
 package is.hi.hbv601g.verzlunapp.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -16,6 +17,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     private List<Category> categories = new ArrayList<>();
     private final OnCategoryClickListener listener;
+    private static final String TAG = "CategoryAdapter";
 
     public interface OnCategoryClickListener {
         void onCategoryClick(Category category);
@@ -27,7 +29,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     public void setCategories(List<Category> categories) {
         this.categories = categories != null ? categories : new ArrayList<>();
-        notifyDataSetChanged(); // Consider DiffUtil later
+        Log.d(TAG, "setCategories called. New category count: " + this.categories.size());
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -41,6 +44,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         Category currentCategory = categories.get(position);
+        Log.d(TAG, "onBindViewHolder called for position: " + position + ", Category: " + currentCategory.getName());
         holder.bind(currentCategory, listener);
     }
 
@@ -58,7 +62,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         }
 
         void bind(final Category category, final OnCategoryClickListener listener) {
-            // Capitalize the name here before setting it
+
             binding.categoryName.setText(capitalize(category.getName()));
             binding.categoryCard.setOnClickListener(v -> {
                 if (listener != null) {
@@ -67,7 +71,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             });
         }
 
-        // Add the capitalize helper method directly inside the ViewHolder or the Adapter
         private static String capitalize(String s) {
             if (s == null || s.isEmpty()) {
                 return s;

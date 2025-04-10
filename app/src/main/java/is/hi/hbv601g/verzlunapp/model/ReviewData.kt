@@ -1,6 +1,5 @@
 package `is`.hi.hbv601g.verzlunapp.model
 
-import java.time.OffsetDateTime
 import java.util.UUID
 
 data class ReviewData(
@@ -8,7 +7,7 @@ data class ReviewData(
     val productId: UUID,
     val rating: Int,
     val comment: String?,
-    val date: OffsetDateTime?,
+    val date: String?,
     val reviewerName: String?,
     val reviewerEmail: String?
 )

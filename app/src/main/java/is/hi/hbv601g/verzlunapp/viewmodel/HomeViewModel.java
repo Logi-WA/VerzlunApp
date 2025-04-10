@@ -7,14 +7,15 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import is.hi.hbv601g.verzlunapp.model.CategoryData;
@@ -31,60 +32,89 @@ import retrofit2.Response;
 public class HomeViewModel extends AndroidViewModel {
 
     private static final String TAG = "HomeViewModel";
-    private static final int MAX_CATEGORIES_ON_HOME = 3; // How many categories to show on home (requires changes in HomeFragment)
-    private static final int MAX_PRODUCTS_PER_CATEGORY_HOME = 10; // Max products per category list
+    private static final int MAX_CATEGORIES_ON_HOME = 3;
+    private static final int MAX_PRODUCTS_PER_CATEGORY_HOME = 10;
     private final ApiService apiService;
     private final MutableLiveData<List<Category>> _categories = new MutableLiveData<>();
-    public final LiveData<List<Category>> categories = _categories; // For the top horizontal category list
+    public final LiveData<List<Category>> categories = _categories;
 
     private final MutableLiveData<List<Product>> _featuredProducts = new MutableLiveData<>();
     public final LiveData<List<Product>> featuredProducts = _featuredProducts;
 
-    // Store pairs of (Category Name, List<Product>)
     private final MutableLiveData<List<Pair<String, List<Product>>>> _categoryProductLists = new MutableLiveData<>(new ArrayList<>());
     public final LiveData<List<Pair<String, List<Product>>>> categoryProductLists = _categoryProductLists;
 
-    // Keep track of categories we are fetching products for
     private final List<String> categoriesToFetch = new ArrayList<>();
-    private final Map<String, List<Product>> fetchedCategoryProducts = new HashMap<>(); // Temp. storage
+    private final Map<String, List<Product>> fetchedCategoryProducts = new HashMap<>();
 
-    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
-    public final LiveData<Boolean> isLoading = _isLoading;
+    private final MediatorLiveData<Boolean> _isLoadingMediator = new MediatorLiveData<>();
+    public final LiveData<Boolean> isLoading = _isLoadingMediator;
 
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     public final LiveData<String> errorMessage = _errorMessage;
-    // Track completion of async operations
+
     private final MutableLiveData<Boolean> _featuredProductsFetchComplete = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> _categoriesFetchComplete = new MutableLiveData<>(false);
-    private final AtomicInteger categoryProductFetchesRemaining = new AtomicInteger(0);
+    private final MutableLiveData<Boolean> _categoryProductsFetchComplete = new MutableLiveData<>(false);
 
     public HomeViewModel(@NonNull Application application) {
         super(application);
         apiService = RetrofitClient.INSTANCE.getApiService();
+        setupLoadingMediator();
         fetchInitialData();
     }
 
+    private void setupLoadingMediator() {
+
+        Observer<Boolean> loadingObserver = finished -> {
+            Boolean categoriesDone = _categoriesFetchComplete.getValue();
+            Boolean featuredDone = _featuredProductsFetchComplete.getValue();
+            Boolean categoryProductsDone = _categoryProductsFetchComplete.getValue();
+
+            Log.d(TAG, "Loading Mediator Check: CategoriesMeta=" + categoriesDone +
+                    ", Featured=" + featuredDone +
+                    ", CategoryProductsChain=" + categoryProductsDone);
+
+            boolean allDone = (categoriesDone != null && categoriesDone) &&
+                    (featuredDone != null && featuredDone) &&
+                    (categoryProductsDone != null && categoryProductsDone);
+
+            Log.d(TAG, "Loading Mediator: All operations complete = " + allDone);
+
+            _isLoadingMediator.setValue(!allDone);
+        };
+
+        _isLoadingMediator.addSource(_categoriesFetchComplete, loadingObserver);
+        _isLoadingMediator.addSource(_featuredProductsFetchComplete, loadingObserver);
+        _isLoadingMediator.addSource(_categoryProductsFetchComplete, loadingObserver);
+    }
+
     public void fetchInitialData() {
-        _isLoading.setValue(true);
+
+        _isLoadingMediator.setValue(true);
         _errorMessage.setValue(null);
-        _categoryProductLists.setValue(new ArrayList<>()); // Clear previous lists
+        _categoryProductLists.setValue(new ArrayList<>());
         fetchedCategoryProducts.clear();
         categoriesToFetch.clear();
-        categoryProductFetchesRemaining.set(0); // Reset counter
-        _featuredProductsFetchComplete.setValue(false); // Reset flags
+
+        _featuredProductsFetchComplete.setValue(false);
         _categoriesFetchComplete.setValue(false);
+        _categoryProductsFetchComplete.setValue(false);
 
         Log.d(TAG, "Starting initial data fetch...");
-        fetchCategories(); // This will chain category product fetches
-        fetchFeaturedProducts(); // Fetch featured products independently
+        fetchCategories();
+        fetchFeaturedProducts();
     }
 
     private void fetchCategories() {
+        Log.d(TAG, "Attempting to fetch categories...");
         apiService.getCategories().enqueue(new Callback<GenericApiResponse<List<CategoryData>>>() {
             @Override
             public void onResponse(@NonNull Call<GenericApiResponse<List<CategoryData>>> call, @NonNull Response<GenericApiResponse<List<CategoryData>>> response) {
+                boolean success = false;
                 if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
                     List<Category> categoryList = mapCategoryDataList(response.body().getData());
+                    Log.i(TAG, "Successfully fetched " + (categoryList != null ? categoryList.size() : 0) + " categories.");
                     _categories.postValue(categoryList);
 
                     List<Category> shuffledCategories = new ArrayList<>(categoryList);
@@ -97,33 +127,42 @@ public class HomeViewModel extends AndroidViewModel {
                             categoriesToFetch.add(cat.getName());
                         }
                     }
-                    categoryProductFetchesRemaining.set(categoriesToFetch.size());
-                    Log.d(TAG, "Categories fetched. Need to fetch products for " + categoryProductFetchesRemaining.get() + " categories.");
-                    fetchProductsForNextCategory(); // Start fetching products
+
+                    if (categoriesToFetch.isEmpty()) {
+                        Log.d(TAG, "No categories selected for product fetching. Marking category products chain as complete.");
+                        _categoryProductsFetchComplete.postValue(true);
+                    } else {
+                        Log.d(TAG, "Categories fetched. Will attempt to fetch products for " + categoriesToFetch.size() + " categories sequentially.");
+
+                        fetchProductsForNextCategory();
+                    }
+                    success = true;
 
                 } else {
-                    Log.e(TAG, "Failed to fetch categories: " + response.code());
-                    _errorMessage.postValue("Failed to load categories");
+                    Log.e(TAG, "Failed to fetch categories. Code: " + response.code() + " Message: " + response.message());
+                    _errorMessage.postValue("Failed to load categories (Code: " + response.code() + ")");
                     _categories.postValue(Collections.emptyList());
-                    categoryProductFetchesRemaining.set(0); // No categories to fetch products for
+
+                    _categoryProductsFetchComplete.postValue(true);
                 }
-                _categoriesFetchComplete.postValue(true); // Mark categories fetch as complete (success or fail)
-                checkIfAllFetchesComplete(); // Check if loading should stop
+
+                _categoriesFetchComplete.postValue(true);
+
             }
 
             @Override
             public void onFailure(@NonNull Call<GenericApiResponse<List<CategoryData>>> call, @NonNull Throwable t) {
                 Log.e(TAG, "Network error fetching categories", t);
-                _errorMessage.postValue("Network Error: " + t.getMessage());
+                _errorMessage.postValue("Network Error fetching categories: " + t.getMessage());
                 _categories.postValue(Collections.emptyList());
-                categoryProductFetchesRemaining.set(0); // No categories to fetch products for
-                _categoriesFetchComplete.postValue(true); // Mark categories fetch as complete (error)
-                checkIfAllFetchesComplete();
+
+                _categoryProductsFetchComplete.postValue(true);
+                _categoriesFetchComplete.postValue(true);
+
             }
         });
     }
 
-    // Helper to map List<CategoryData> to List<Category>
     private List<Category> mapCategoryDataList(List<CategoryData> dataList) {
         if (dataList == null) return Collections.emptyList();
         return dataList.stream()
@@ -138,32 +177,37 @@ public class HomeViewModel extends AndroidViewModel {
 
     private void fetchProductsForNextCategory() {
         if (categoriesToFetch.isEmpty()) {
-            // This case is handled by the counter decrementing to 0
+            Log.d(TAG, "All category products fetch sequence complete.");
+            updateCategoryProductListsLiveData();
+
+            _categoryProductsFetchComplete.postValue(true);
+
             return;
         }
-        String categoryName = categoriesToFetch.remove(0);
+
+        String categoryName = categoriesToFetch.get(0);
+        Log.d(TAG, "Fetching next in sequence: " + categoryName);
         fetchProductsByCategoryName(categoryName);
     }
 
     private void fetchProductsByCategoryName(String categoryName) {
-        Log.d(TAG, "Fetching products for category: " + categoryName);
+        Log.d(TAG, "Requesting products for category: " + categoryName);
         apiService.getProducts(categoryName).enqueue(new Callback<GenericApiResponse<List<ProductData>>>() {
             @Override
             public void onResponse(@NonNull Call<GenericApiResponse<List<ProductData>>> call, @NonNull Response<GenericApiResponse<List<ProductData>>> response) {
-                // ... (mapping ProductData to Product and storing in fetchedCategoryProducts) ...
                 handleCategoryProductResponse(categoryName, response.isSuccessful() ? response.body() : null, response.code());
             }
 
             @Override
             public void onFailure(@NonNull Call<GenericApiResponse<List<ProductData>>> call, @NonNull Throwable t) {
                 Log.e(TAG, "Network error fetching products for category " + categoryName, t);
-                handleCategoryProductResponse(categoryName, null, -1); // Indicate network error
+                handleCategoryProductResponse(categoryName, null, -1);
             }
         });
     }
 
-    // Helper to process category product response and decrement counter
     private void handleCategoryProductResponse(String categoryName, GenericApiResponse<List<ProductData>> apiResponse, int responseCode) {
+
         if (apiResponse != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
             List<Product> productList = apiResponse.getData().stream()
                     .map(HomeViewModel::mapProductDataToProduct)
@@ -172,30 +216,33 @@ public class HomeViewModel extends AndroidViewModel {
             fetchedCategoryProducts.put(categoryName, new ArrayList<>(productList.subList(0, limit)));
             Log.d(TAG, "Successfully fetched " + limit + " products for " + categoryName);
         } else {
-            if (responseCode > 0) { // Only log HTTP error if not network error
+            if (responseCode > 0) {
                 Log.e(TAG, "Failed to fetch products for category " + categoryName + ": " + responseCode);
             }
             fetchedCategoryProducts.put(categoryName, Collections.emptyList());
         }
 
-        // Decrement counter and check completion
-        int remaining = categoryProductFetchesRemaining.decrementAndGet();
-        Log.d(TAG, "Category product fetch finished for " + categoryName + ". Remaining: " + remaining);
-        if (remaining == 0) {
-            Log.d(TAG, "All category product fetches complete.");
-            updateCategoryProductListsLiveData(); // Update the list for UI
-            checkIfAllFetchesComplete(); // Check overall completion
+        if (!categoriesToFetch.isEmpty() && categoriesToFetch.get(0).equals(categoryName)) {
+            categoriesToFetch.remove(0);
+            Log.d(TAG, "Processed and removed: " + categoryName + ". Remaining categories in sequence: " + categoriesToFetch.size());
+        } else {
+
+            Log.w(TAG, "Category name mismatch or list already empty when handling response for: " + categoryName);
+
+            categoriesToFetch.remove(categoryName);
         }
+
+        fetchProductsForNextCategory();
     }
 
-    // Fetch featured products
     public void fetchFeaturedProducts() {
+        Log.d(TAG, "Attempting to fetch featured products...");
         apiService.getProducts(null).enqueue(new Callback<GenericApiResponse<List<ProductData>>>() {
             @Override
             public void onResponse(@NonNull Call<GenericApiResponse<List<ProductData>>> call, @NonNull Response<GenericApiResponse<List<ProductData>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
-                    // ... (mapping and shuffling) ...
                     List<Product> productList = mapProductDataListToProductList(response.body().getData());
+                    Log.i(TAG, "Successfully fetched " + (productList != null ? productList.size() : 0) + " featured products (before shuffle/limit).");
                     if (!productList.isEmpty()) {
                         Collections.shuffle(productList);
                         int limit = Math.min(productList.size(), 10);
@@ -204,24 +251,25 @@ public class HomeViewModel extends AndroidViewModel {
                         _featuredProducts.postValue(Collections.emptyList());
                     }
                 } else {
-                    Log.e(TAG, "Failed to fetch featured products: " + response.code());
+                    Log.e(TAG, "Failed to fetch featured products: " + response.code() + " Message: " + response.message());
                     _featuredProducts.postValue(Collections.emptyList());
                 }
-                _featuredProductsFetchComplete.postValue(true); // Mark featured fetch complete
-                checkIfAllFetchesComplete();
+
+                _featuredProductsFetchComplete.postValue(true);
+
             }
 
             @Override
             public void onFailure(@NonNull Call<GenericApiResponse<List<ProductData>>> call, @NonNull Throwable t) {
                 Log.e(TAG, "Network error fetching featured products", t);
                 _featuredProducts.postValue(Collections.emptyList());
-                _featuredProductsFetchComplete.postValue(true); // Mark featured fetch complete (error)
-                checkIfAllFetchesComplete();
+
+                _featuredProductsFetchComplete.postValue(true);
+
             }
         });
     }
 
-    // Helper to map List<ProductData> to List<Product>
     private List<Product> mapProductDataListToProductList(List<ProductData> dataList) {
         if (dataList == null) return Collections.emptyList();
         return dataList.stream()
@@ -229,27 +277,6 @@ public class HomeViewModel extends AndroidViewModel {
                 .collect(Collectors.toList());
     }
 
-    // Revised check for completion
-    private void checkIfAllFetchesComplete() {
-        boolean categoriesDone = Boolean.TRUE.equals(_categoriesFetchComplete.getValue());
-        boolean featuredDone = Boolean.TRUE.equals(_featuredProductsFetchComplete.getValue());
-        boolean categoryProductsDone = categoryProductFetchesRemaining.get() <= 0; // Check if counter is 0 or less
-
-        Log.d(TAG, "Checking completion: CategoriesDone=" + categoriesDone + ", FeaturedDone=" + featuredDone + ", CategoryProductsDone=" + categoryProductsDone);
-
-        // Only set isLoading to false if ALL relevant fetches are marked complete
-        // and the counter for category products has reached zero.
-        if (categoriesDone && featuredDone && categoryProductsDone) {
-            _isLoading.postValue(false);
-            Log.i(TAG, "All initial data fetches are complete. Loading indicator stopped.");
-        } else {
-            // Keep loading indicator active if any part is still pending
-            _isLoading.postValue(true);
-            Log.d(TAG, "Fetches still in progress. Loading indicator active.");
-        }
-    }
-
-    // Helper method to convert ProductData to Product
     private static Product mapProductDataToProduct(ProductData data) {
         Product prod = new Product();
         prod.setId(data.getId());
@@ -263,16 +290,15 @@ public class HomeViewModel extends AndroidViewModel {
         return prod;
     }
 
-
-    // Updates the LiveData that the Fragment observes
     private void updateCategoryProductListsLiveData() {
         List<Pair<String, List<Product>>> sortedLists = new ArrayList<>();
 
         for (Map.Entry<String, List<Product>> entry : fetchedCategoryProducts.entrySet()) {
-            if (!entry.getValue().isEmpty()) { // Only add if there are products
+            if (!entry.getValue().isEmpty()) {
                 sortedLists.add(new Pair<>(entry.getKey(), entry.getValue()));
             }
         }
+        Log.d(TAG, "Updating categoryProductLists LiveData with " + sortedLists.size() + " lists.");
         _categoryProductLists.postValue(sortedLists);
     }
 }
